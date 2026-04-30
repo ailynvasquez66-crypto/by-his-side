@@ -5,54 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>By His Side 📸</title>
     
-    <!-- ICONO PARA PANTALLA DE INICIO -->
-    <!-- Nota: Para que no salga la "B", sube la imagen recortada como cuadrado a Supabase y pon el link aquí -->
-    <link rel="apple-touch-icon" href="TU_URL_DE_IMAGEN_CUADRADA_AQUI">
-    
+    <!-- ESTO QUITA LA "B" FEA: Usamos el link directo de la imagen de Pinterest -->
+    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg">
+    <link rel="icon" href="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg">
+
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 80px; }
-        
-        /* CONTENEDOR DEL LOGO EN EL HEADER */
-        .logo-container {
-            width: 100%;
-            height: 60px; /* Ajusta la altura que quieras */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .logo-img {
-            height: 100%; /* Hace que se ajuste a lo alto */
-            width: auto;   /* Mantiene la proporción sin estirar */
-            object-fit: contain; /* Evita los bordes blancos si el contenedor es distinto */
-        }
-
         .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; text-align: center; }
-        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 5px; position: sticky; top: 0; z-index: 100; }
         
-        /* Resto de estilos del proyecto */
+        /* HEADER ARREGLADO */
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 60px; }
+        .logo-img { height: 45px; width: auto; object-fit: contain; }
+
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
-        .card { background: white; border: 1px solid #c2d6c2; padding: 20px; margin-bottom: 15px; border-radius: 12px; }
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .card { background: white; border: 1px solid #c2d6c2; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .hidden { display: none; }
+        
+        /* Navbar básica para que no se vea vacío */
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; }
+        .nav-item { font-size: 24px; background: none; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="main-app">
         <header>
-            <div class="logo-container">
-                <!-- Aquí pones el link de Pinterest o el de tu Supabase -->
-                <img src="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg" class="logo-img" alt="By His Side">
-            </div>
+            <!-- LOGO ARREGLADO (Link directo) -->
+            <img src="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg" class="logo-img" alt="By His Side">
         </header>
-
+        
         <div class="container">
-            <!-- El resto de tu contenido -->
+            <div id="view-home">
+                <div class="card" style="text-align: center;">
+                    <h2 class="titulo-cursivo" style="font-size: 30px;">¡Ya quedó! ✨</h2>
+                    <p>Si ves el logo verde arriba, la app ya no está descompuesta.</p>
+                </div>
+            </div>
         </div>
+
+        <nav class="navbar">
+            <button class="nav-item">🏠</button>
+            <button class="nav-item">👤</button>
+        </nav>
     </div>
 
 </body>
