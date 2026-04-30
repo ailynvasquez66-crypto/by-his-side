@@ -8,35 +8,100 @@
     <title>By His Side 📸</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #fafafa; margin: 0; padding-bottom: 80px; }
+        /* COLORES ACTUALIZADOS PARA COMBINAR CON EL LOGO */
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background: #f0f4f0; /* Fondo gris verdoso muy claro */
+            margin: 0; 
+            padding-bottom: 80px; 
+        }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
-        .card { background: white; border: 1px solid #dbdbdb; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dbdbdb; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; background: #0095f6; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        .card { 
+            background: white; 
+            border: 1px solid #c2d6c2; /* Borde verde suave */
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 1px solid #a3bfa3; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+        }
+
+        button { 
+            width: 100%; 
+            background: #2d5a27; /* Verde bosque oscuro como el logo */
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.3s;
+        }
+        button:active { background: #1b3a1a; }
         
         .profile-header { display: flex; align-items: center; padding: 20px 0; }
-        .profile-pic { width: 85px; height: 85px; border-radius: 50%; border: 1px solid #dbdbdb; object-fit: cover; background: #eee;}
+        .profile-pic { 
+            width: 85px; 
+            height: 85px; 
+            border-radius: 50%; 
+            border: 2px solid #2d5a27; 
+            object-fit: cover; 
+            background: #eee;
+        }
+        
         .profile-stats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
-        .stat-num { font-weight: bold; display: block; font-size: 17px;}
-        .profile-name-bar { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
-        .profile-bio { font-size: 14px; margin: 0; color: #262626; }
+        .stat-num { font-weight: bold; display: block; font-size: 17px; color: #1b3a1a; }
+        .profile-name-bar { font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #1b3a1a; }
+        .profile-bio { font-size: 14px; margin: 0; color: #4a5d4a; }
 
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #dbdbdb; display: flex; justify-content: space-around; padding: 15px 0; z-index: 1000; }
-        .nav-item { cursor: pointer; font-size: 24px; background: none; border: none; }
+        .navbar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border-top: 1px solid #c2d6c2; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 10px 0; 
+            z-index: 1000; 
+        }
+        .nav-item { cursor: pointer; font-size: 24px; background: none; border: none; padding: 10px; }
         .hidden { display: none; }
-        header { background: white; border-bottom: 1px solid #dbdbdb; padding: 12px; text-align: center; font-weight: bold; position: sticky; top: 0; }
+        
+        header { 
+            background: white; 
+            border-bottom: 1px solid #c2d6c2; 
+            padding: 15px; 
+            text-align: center; 
+            font-weight: bold; 
+            color: #2d5a27;
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="container">
         <div class="card">
-            <h2 style="text-align:center">By His Side</h2>
+            <h2 style="text-align:center; color: #2d5a27;">By His Side</h2>
             <input type="text" id="username" placeholder="Tu alias">
             <input type="text" id="email" placeholder="Correo">
             <input type="password" id="password" placeholder="Contraseña">
             <button onclick="login()">Entrar</button>
-            <button onclick="registro()" style="background: #00ce64; margin-top: 10px;">Crear cuenta</button>
+            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
         </div>
     </div>
 
@@ -74,8 +139,8 @@
                 <p id="profile-descripcion" class="profile-bio">Welcome to By His Side ✨</p>
                 
                 <div style="display:flex; gap:8px; margin: 15px 0;">
-                    <button onclick="toggleEdit()" style="background: #efefef; color: black; flex: 1;">Editar perfil</button>
-                    <button onclick="salir()" style="background: #efefef; color: #ed4956; width: auto; padding: 0 10px;">Salir</button>
+                    <button onclick="toggleEdit()" style="background: #e8eee8; color: #2d5a27; flex: 1;">Editar perfil</button>
+                    <button onclick="salir()" style="background: #ffebeb; color: #ed4956; width: auto; padding: 0 10px;">Salir</button>
                 </div>
 
                 <div id="edit-form" class="card hidden">
@@ -145,7 +210,7 @@
             feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#888; margin-top:50px;'>No hay recuerdos aún.</p>";
             pubs?.forEach(p => {
                 feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;">
-                    <div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div>
+                    <div style="padding:10px; font-weight:bold; color: #2d5a27;">@${p.nombre_usuario}</div>
                     <img src="${p['URL de la imagen']}" style="width:100%;">
                     <div style="padding:10px;">${p['descripción'] || ''}</div>
                 </div>`;
@@ -165,7 +230,7 @@
             const feedP = document.getElementById('feed-personal');
             feedP.innerHTML = misPubs?.length ? "" : "<p style='width:100%; text-align:center; color:#888;'>Sin fotos.</p>";
             misPubs?.forEach(foto => {
-                feedP.innerHTML += `<img src="${foto['URL de la imagen']}" style="width:32.3%; aspect-ratio:1/1; object-fit:cover; border-radius:2px;">`;
+                feedP.innerHTML += `<img src="${foto['URL de la imagen']}" style="width:32.3%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;">`;
             });
 
             const { count: nP } = await _supabase.from('publicaciones').select('*', { count: 'exact', head: true }).eq('email_usuario', user.email);
