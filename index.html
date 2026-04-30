@@ -1,25 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="manifest" href="/manifest.json">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>By His Side 📸</title>
+
+    <!-- FUENTE CURSIVA ELEGANTE -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <!-- 1. PARA ANDROID -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- 2. PARA IPHONE -->
+    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/18/9f/75/189f7556dcb1da733939f8b668bdde68.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ByHisSide">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* COLORES ACTUALIZADOS PARA COMBINAR CON EL LOGO */
         body { 
-            font-family: -apple-system, sans-serif; 
-            background: #f0f4f0; /* Fondo gris verdoso muy claro */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f0f4f0; 
             margin: 0; 
             padding-bottom: 80px; 
         }
+
+        /* ESTILO PARA LAS LETRAS CURSIVAS */
+        .titulo-cursivo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32px;
+            color: #2d5a27;
+            margin: 10px 0;
+        }
+
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
         
         .card { 
             background: white; 
-            border: 1px solid #c2d6c2; /* Borde verde suave */
+            border: 1px solid #c2d6c2; 
             padding: 20px; 
             margin-bottom: 15px; 
             border-radius: 12px; 
@@ -38,7 +57,7 @@
 
         button { 
             width: 100%; 
-            background: #2d5a27; /* Verde bosque oscuro como el logo */
+            background: #2d5a27; 
             color: white; 
             border: none; 
             padding: 12px; 
@@ -82,10 +101,8 @@
         header { 
             background: white; 
             border-bottom: 1px solid #c2d6c2; 
-            padding: 15px; 
+            padding: 10px; 
             text-align: center; 
-            font-weight: bold; 
-            color: #2d5a27;
             position: sticky; 
             top: 0; 
             z-index: 100;
@@ -95,8 +112,8 @@
 <body>
 
     <div id="auth-screen" class="container">
-        <div class="card">
-            <h2 style="text-align:center; color: #2d5a27;">By His Side</h2>
+        <div class="card" style="text-align: center;">
+            <h2 class="titulo-cursivo">By His Side</h2>
             <input type="text" id="username" placeholder="Tu alias">
             <input type="text" id="email" placeholder="Correo">
             <input type="password" id="password" placeholder="Contraseña">
@@ -106,7 +123,7 @@
     </div>
 
     <div id="main-app" class="hidden">
-        <header>By His Side</header>
+        <header><div class="titulo-cursivo" style="font-size: 24px; margin: 0;">By His Side</div></header>
         <div class="container">
             <div id="view-home"><div id="feed-general"></div></div>
             
