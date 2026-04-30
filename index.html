@@ -5,51 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>By His Side 📸</title>
     
-    <!-- ESTO QUITA LA "B" FEA: Usamos el link directo de la imagen de Pinterest -->
-    <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg">
-    <link rel="icon" href="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg">
-
+    <!-- LINK PARA EL ICONO DEL IPHONE (Pega aquí el link de tu imagen de Supabase) -->
+    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_app.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 80px; }
         .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; text-align: center; }
-        
-        /* HEADER ARREGLADO */
-        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 60px; }
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; position: sticky; top: 0; z-index: 100; min-height: 60px; }
         .logo-img { height: 45px; width: auto; object-fit: contain; }
-
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
         .card { background: white; border: 1px solid #c2d6c2; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .hidden { display: none; }
-        
-        /* Navbar básica para que no se vea vacío */
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .nav-item { font-size: 24px; background: none; border: none; cursor: pointer; }
+        .hidden { display: none; }
+        .profile-pic { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #2d5a27; object-fit: cover; }
+        .grid-perfil { display: flex; flex-wrap: wrap; gap: 4px; }
+        .grid-item { width: calc(33.33% - 4px); aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <div id="main-app">
+    <div id="auth-screen" class="container">
+        <div class="card" style="text-align: center;">
+            <h2 class="titulo-cursivo" style="font-size: 42px;">By His Side</h2>
+            <input type="text" id="username" placeholder="Tu alias">
+            <input type="text" id="email" placeholder="Correo">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button onclick="login()">Entrar</button>
+            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
         <header>
-            <!-- LOGO ARREGLADO (Link directo) -->
-            <img src="https://i.pinimg.com/736x/0a/61/0a/0a610a8e2e2e75e1b2e2e75e1b2e2e75.jpg" class="logo-img" alt="By His Side">
+            <img src="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_app.png" class="logo-img">
         </header>
         
         <div class="container">
-            <div id="view-home">
-                <div class="card" style="text-align: center;">
-                    <h2 class="titulo-cursivo" style="font-size: 30px;">¡Ya quedó! ✨</h2>
-                    <p>Si ves el logo verde arriba, la app ya no está descompuesta.</p>
+            <div id="view-home"><div id="feed-general"></div></div>
+            <div id="view-profile" class="hidden">
+                <div style="display:flex; align-items:center; padding-bottom: 20px;">
+                    <img id="my-profile-pic" class="profile-pic" src="">
+                    <div style="margin-left: 20px;">
+                        <span id="profile-alias" style="font-weight:bold; font-size:18px;"></span>
+                    </div>
                 </div>
+                <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
 
         <nav class="navbar">
-            <button class="nav-item">🏠</button>
-            <button class="nav-item">👤</button>
+            <button class="nav-item" onclick="showView('home')">🏠</button>
+            <button class="nav-item" onclick="showView('profile')">👤</button>
         </nav>
     </div>
 
+    <script>
+        const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
+        const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
+        const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
+
+        function showView(v) {
+            ['home', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
+            document.getElementById('view-'+v).classList.remove('hidden');
+            if(v==='home') cargarFotos();
+            if(v==='profile') cargarDatosPerfil();
+        }
+
+        async function login() {
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value;
+            const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
+            if (error) alert(error.message); else location.reload();
+        }
+
+        async function registro() {
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
+            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
+            if (error) return alert(error.message);
+            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e }]);
+            alert("¡Cuenta creada!");
+        }
+
+        async function checarSesion() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (user) { 
+                document.getElementById('auth-screen').classList.add('hidden'); 
+                document.getElementById('main-app').classList.remove('hidden');
+                cargarFotos(); 
+            }
+        }
+
+        async function cargarFotos() {
+            const { data: pubs } = await _supabase.from('publicaciones').select('*').order('creado_en', { ascending: false });
+            const feed = document.getElementById('feed-general');
+            feed.innerHTML = "";
+            pubs?.forEach(p => {
+                feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;"><div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" style="width:100%;"><div style="padding:10px;">${p['descripción'] || ''}</div></div>`;
+            });
+        }
+
+        async function cargarDatosPerfil() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
+            if(p) {
+                document.getElementById('profile-alias').innerText = "@" + p.username;
+                document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
+            }
+            const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email);
+            const feedPersonal = document.getElementById('feed-personal');
+            feedPersonal.innerHTML = "";
+            misPubs?.forEach(pub => {
+                feedPersonal.innerHTML += `<div class="grid-item"><img src="${pub['URL de la imagen']}"></div>`;
+            });
+        }
+
+        checarSesion();
+    </script>
 </body>
 </html>
