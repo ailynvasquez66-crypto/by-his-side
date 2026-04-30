@@ -8,7 +8,7 @@
     <!-- FUENTE CURSIVA ELEGANTE -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
-    <!-- CONFIGURACIÓN DEL LOGO (IPHONE Y ANDROID) -->
+    <!-- CONFIGURACIÓN DEL LOGO -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://wsrv.nl/?url=i.pinimg.com/736x/18/9f/75/189f7556dcb1da733939f8b668bdde68.jpg&w=512&h=512&fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,7 +24,6 @@
             padding-bottom: 80px; 
         }
 
-        /* ESTILO PARA LAS LETRAS CURSIVAS */
         .titulo-cursivo {
             font-family: 'Dancing Script', cursive;
             font-size: 32px;
@@ -97,6 +96,15 @@
             top: 0; 
             z-index: 100;
         }
+
+        .btn-edit {
+            background: #eef3ee;
+            color: #2d5a27;
+            border: 1px solid #c2d6c2;
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 8px;
+        }
     </style>
 </head>
 <body>
@@ -116,6 +124,7 @@
         <header><div class="titulo-cursivo" style="font-size: 24px; margin: 0;">By His Side</div></header>
         <div class="container">
             <div id="view-home"><div id="feed-general"></div></div>
+            
             <div id="view-search" class="hidden">
                 <div class="card">
                     <h3>🔍 Buscar Amigos</h3>
@@ -123,6 +132,7 @@
                     <button onclick="agregarPorNombre()">Agregar</button>
                 </div>
             </div>
+
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3>➕ Nuevo Recuerdo</h3>
@@ -131,6 +141,19 @@
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
+
+            <!-- VISTA DE EDITAR PERFIL -->
+            <div id="view-edit-profile" class="hidden">
+                <div class="card">
+                    <h3>⚙️ Editar Perfil</h3>
+                    <p style="font-size: 12px; color: gray;">Actualiza tu alias o foto de perfil</p>
+                    <input type="text" id="new-username" placeholder="Nuevo alias">
+                    <input type="text" id="new-photo" placeholder="URL de nueva foto">
+                    <button onclick="actualizarPerfil()">Guardar Cambios</button>
+                    <button onclick="showView('profile')" style="background:none; color:gray; margin-top:10px;">Cancelar</button>
+                </div>
+            </div>
+
             <div id="view-profile" class="hidden">
                 <div class="profile-header">
                     <img id="my-profile-pic" class="profile-pic" src="">
@@ -141,6 +164,10 @@
                 </div>
                 <div id="profile-alias" style="font-weight:bold; font-size:18px;">Usuario</div>
                 <p id="profile-descripcion">Welcome to By His Side ✨</p>
+                
+                <!-- BOTÓN REGRESADO -->
+                <button class="btn-edit" onclick="showView('edit-profile')">Editar Perfil</button>
+                
                 <button onclick="salir()" style="background: #ffebeb; color: #ed4956; margin-top:10px;">Cerrar Sesión</button>
                 <div id="feed-personal" style="display: flex; flex-wrap: wrap; gap: 4px; padding-top: 20px;"></div>
             </div>
@@ -148,7 +175,7 @@
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
             <button class="nav-item" onclick="showView('search')">🔍</button>
-            <button class="nav-item" onclick="showItem('upload')">➕</button>
+            <button class="nav-item" onclick="showView('upload')">➕</button>
             <button class="nav-item" onclick="showView('profile')">👤</button>
         </nav>
     </div>
@@ -159,7 +186,7 @@
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
 
         function showView(v) {
-            ['home', 'search', 'upload', 'profile'].forEach(x => {
+            ['home', 'search', 'upload', 'profile', 'edit-profile'].forEach(x => {
                 const el = document.getElementById('view-'+x);
                 if(el) el.classList.add('hidden');
             });
@@ -167,9 +194,6 @@
             if(v==='home') cargarFotos();
             if(v==='profile') cargarDatosPerfil();
         }
-
-        // Función auxiliar para el botón "+" que no estaba definido correctamente en el HTML original
-        function showItem(v) { showView(v); }
 
         async function registro() {
             const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
@@ -196,10 +220,8 @@
             }
         }
 
-        // --- CARGAR FOTOS EN EL INICIO (FEED GLOBAL SIN LO MÍO) ---
         async function cargarFotos() {
             const { data: { user } } = await _supabase.auth.getUser();
-            // Filtro para NO mostrar mis propias publicaciones en el inicio
             const { data: pubs } = await _supabase.from('publicaciones')
                 .select('*')
                 .neq('email_usuario', user.email)
@@ -218,18 +240,14 @@
             }
         }
 
-        // --- CARGAR DATOS Y FOTOS EN EL PERFIL (SOLO LO MÍO) ---
         async function cargarDatosPerfil() {
             const { data: { user } } = await _supabase.auth.getUser();
-            
-            // Cargar datos del perfil
             const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
             if(p) {
                 document.getElementById('profile-alias').innerText = p.username;
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${user.id}`;
             }
 
-            // Cargar SOLO mis fotos para el perfil
             const { data: misPubs } = await _supabase.from('publicaciones')
                 .select('*')
                 .eq('email_usuario', user.email)
@@ -237,7 +255,6 @@
 
             const feedPersonal = document.getElementById('feed-personal');
             const contadorPosts = document.getElementById('num-posts');
-            
             feedPersonal.innerHTML = "";
             contadorPosts.innerText = misPubs ? misPubs.length : 0;
 
@@ -251,6 +268,23 @@
             }
         }
 
+        async function actualizarPerfil() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const nuevoUser = document.getElementById('new-username').value;
+            const nuevaFoto = document.getElementById('new-photo').value;
+            
+            const cambios = {};
+            if(nuevoUser) cambios.username = nuevoUser;
+            if(nuevaFoto) cambios.foto_perfil = nuevaFoto;
+
+            const { error } = await _supabase.from('perfiles').update(cambios).eq('id', user.id);
+            if(error) alert("Error al actualizar");
+            else {
+                alert("Perfil actualizado ✨");
+                showView('profile');
+            }
+        }
+
         async function subirFoto() {
             const btn = document.getElementById('btn-subir');
             const { data: { user } } = await _supabase.auth.getUser();
@@ -259,11 +293,11 @@
             
             btn.innerText = "Subiendo...";
             const n = `${Date.now()}_img`;
-            
             const { error: uploadError } = await _supabase.storage.from('fotos').upload(n, f);
+            
             if(uploadError) {
                 btn.innerText = "Publicar";
-                return alert("Error al subir imagen");
+                return alert("Error al subir");
             }
 
             const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
