@@ -4,107 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>By His Side 📸</title>
-
-    <!-- FUENTE CURSIVA ELEGANTE -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-
-    <!-- CONFIGURACIÓN DEL LOGO -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="https://wsrv.nl/?url=i.pinimg.com/736x/18/9f/75/189f7556dcb1da733939f8b668bdde68.jpg&w=512&h=512&fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ByHisSide">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: #f0f4f0; 
-            margin: 0; 
-            padding-bottom: 80px; 
-        }
-
-        .titulo-cursivo {
-            font-family: 'Dancing Script', cursive;
-            font-size: 32px;
-            color: #2d5a27;
-            margin: 10px 0;
-        }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 80px; }
+        .titulo-cursivo { font-family: 'Dancing Script', cursive; font-size: 32px; color: #2d5a27; margin: 10px 0; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
-        
-        .card { 
-            background: white; 
-            border: 1px solid #c2d6c2; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        input, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border: 1px solid #a3bfa3; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-        }
-
-        button { 
-            width: 100%; 
-            background: #2d5a27; 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-        }
-        
+        .card { background: white; border: 1px solid #c2d6c2; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .profile-header { display: flex; align-items: center; padding: 20px 0; }
-        .profile-pic { 
-            width: 85px; 
-            height: 85px; 
-            border-radius: 50%; 
-            border: 2px solid #2d5a27; 
-            object-fit: cover; 
-        }
-        
-        .navbar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: white; 
-            border-top: 1px solid #c2d6c2; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 10px 0; 
-            z-index: 1000; 
-        }
+        .profile-pic { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #2d5a27; object-fit: cover; }
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .nav-item { cursor: pointer; font-size: 24px; background: none; border: none; padding: 10px; }
         .hidden { display: none; }
-        
-        header { 
-            background: white; 
-            border-bottom: 1px solid #c2d6c2; 
-            padding: 10px; 
-            text-align: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-        }
-
-        .btn-edit {
-            background: #eef3ee;
-            color: #2d5a27;
-            border: 1px solid #c2d6c2;
-            margin-top: 10px;
-            font-size: 14px;
-            padding: 8px;
-        }
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .btn-edit { background: #eef3ee; color: #2d5a27; border: 1px solid #c2d6c2; margin-top: 10px; font-size: 14px; padding: 8px; }
+        .grid-perfil { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 20px; }
+        .grid-item { width: calc(33.33% - 4px); aspect-ratio: 1/1; overflow: hidden; background: #ddd; border-radius: 4px; }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -124,32 +42,16 @@
         <header><div class="titulo-cursivo" style="font-size: 24px; margin: 0;">By His Side</div></header>
         <div class="container">
             <div id="view-home"><div id="feed-general"></div></div>
-            
-            <div id="view-search" class="hidden">
-                <div class="card">
-                    <h3>🔍 Buscar Amigos</h3>
-                    <input type="text" id="buscar-username" placeholder="Alias exacto">
-                    <button onclick="agregarPorNombre()">Agregar</button>
-                </div>
-            </div>
+            <div id="view-search" class="hidden"><div class="card"><h3>🔍 Buscar Amigos</h3><input type="text" id="buscar-username" placeholder="Alias exacto"><button onclick="agregarPorNombre()">Agregar</button></div></div>
+            <div id="view-upload" class="hidden"><div class="card"><h3>➕ Nuevo Recuerdo</h3><input type="file" id="archivo" accept="image/*"><input type="text" id="pie" placeholder="Descripción..."><button id="btn-subir" onclick="subirFoto()">Publicar</button></div></div>
 
-            <div id="view-upload" class="hidden">
-                <div class="card">
-                    <h3>➕ Nuevo Recuerdo</h3>
-                    <input type="file" id="archivo" accept="image/*">
-                    <input type="text" id="pie" placeholder="Descripción...">
-                    <button id="btn-subir" onclick="subirFoto()">Publicar</button>
-                </div>
-            </div>
-
-            <!-- VISTA DE EDITAR PERFIL -->
             <div id="view-edit-profile" class="hidden">
                 <div class="card">
                     <h3>⚙️ Editar Perfil</h3>
-                    <p style="font-size: 12px; color: gray;">Actualiza tu alias o foto de perfil</p>
                     <input type="text" id="new-username" placeholder="Nuevo alias">
-                    <input type="text" id="new-photo" placeholder="URL de nueva foto">
-                    <button onclick="actualizarPerfil()">Guardar Cambios</button>
+                    <p style="font-size: 14px; margin-bottom: 5px;">Foto de perfil desde galería:</p>
+                    <input type="file" id="new-profile-file" accept="image/*">
+                    <button id="btn-actualizar" onclick="actualizarPerfil()">Guardar Cambios</button>
                     <button onclick="showView('profile')" style="background:none; color:gray; margin-top:10px;">Cancelar</button>
                 </div>
             </div>
@@ -162,14 +64,12 @@
                         <div><span style="font-weight:bold; display:block;" id="num-amigos">0</span><span>amigos</span></div>
                     </div>
                 </div>
-                <div id="profile-alias" style="font-weight:bold; font-size:18px;">Usuario</div>
+                <!-- AQUÍ SE CARGARÁ TU NOMBRE REAL -->
+                <div id="profile-alias" style="font-weight:bold; font-size:18px;">Cargando...</div>
                 <p id="profile-descripcion">Welcome to By His Side ✨</p>
-                
-                <!-- BOTÓN REGRESADO -->
                 <button class="btn-edit" onclick="showView('edit-profile')">Editar Perfil</button>
-                
                 <button onclick="salir()" style="background: #ffebeb; color: #ed4956; margin-top:10px;">Cerrar Sesión</button>
-                <div id="feed-personal" style="display: flex; flex-wrap: wrap; gap: 4px; padding-top: 20px;"></div>
+                <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
         <nav class="navbar">
@@ -222,66 +122,54 @@
 
         async function cargarFotos() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data: pubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .neq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
-
             const feed = document.getElementById('feed-general');
             feed.innerHTML = "";
-            if(pubs) {
-                pubs.forEach(p => {
-                    feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;">
-                        <div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div>
-                        <img src="${p['URL de la imagen']}" style="width:100%;">
-                        <div style="padding:10px;">${p['descripción'] || ''}</div>
-                    </div>`;
-                });
-            }
+            const { data: pubs } = await _supabase.from('publicaciones').select('*').neq('email_usuario', user.email).order('creado_en', { ascending: false });
+            pubs?.forEach(p => {
+                feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;"><div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" style="width:100%;"><div style="padding:10px;">${p['descripción'] || ''}</div></div>`;
+            });
         }
 
         async function cargarDatosPerfil() {
             const { data: { user } } = await _supabase.auth.getUser();
             const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
+            
             if(p) {
-                document.getElementById('profile-alias').innerText = p.username;
+                // CORRECCIÓN: Ahora sí escribe tu username real
+                document.getElementById('profile-alias').innerText = "@" + p.username;
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${user.id}`;
             }
 
-            const { data: misPubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .eq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
-
+            const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email).order('creado_en', { ascending: false });
             const feedPersonal = document.getElementById('feed-personal');
-            const contadorPosts = document.getElementById('num-posts');
+            document.getElementById('num-posts').innerText = misPubs ? misPubs.length : 0;
             feedPersonal.innerHTML = "";
-            contadorPosts.innerText = misPubs ? misPubs.length : 0;
-
-            if(misPubs) {
-                misPubs.forEach(pub => {
-                    feedPersonal.innerHTML += `
-                        <div style="width: calc(33.33% - 4px); aspect-ratio: 1/1; overflow: hidden; background: #ddd; border-radius: 4px;">
-                            <img src="${pub['URL de la imagen']}" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>`;
-                });
-            }
+            misPubs?.forEach(pub => {
+                feedPersonal.innerHTML += `<div class="grid-item"><img src="${pub['URL de la imagen']}"></div>`;
+            });
         }
 
         async function actualizarPerfil() {
+            const btn = document.getElementById('btn-actualizar');
             const { data: { user } } = await _supabase.auth.getUser();
             const nuevoUser = document.getElementById('new-username').value;
-            const nuevaFoto = document.getElementById('new-photo').value;
+            const archivo = document.getElementById('new-profile-file').files[0];
             
+            btn.innerText = "Guardando...";
             const cambios = {};
             if(nuevoUser) cambios.username = nuevoUser;
-            if(nuevaFoto) cambios.foto_perfil = nuevaFoto;
+
+            if(archivo) {
+                const nombreFoto = `perfil_${user.id}_${Date.now()}`;
+                await _supabase.storage.from('fotos').upload(nombreFoto, archivo);
+                const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(nombreFoto);
+                cambios.foto_perfil = uD.publicUrl;
+            }
 
             const { error } = await _supabase.from('perfiles').update(cambios).eq('id', user.id);
-            if(error) alert("Error al actualizar");
-            else {
-                alert("Perfil actualizado ✨");
-                showView('profile');
+            if(error) alert("Error"); else {
+                alert("¡Perfil actualizado!");
+                location.reload();
             }
         }
 
@@ -290,26 +178,12 @@
             const { data: { user } } = await _supabase.auth.getUser();
             const f = document.getElementById('archivo').files[0];
             if(!f) return alert("Selecciona foto");
-            
             btn.innerText = "Subiendo...";
             const n = `${Date.now()}_img`;
-            const { error: uploadError } = await _supabase.storage.from('fotos').upload(n, f);
-            
-            if(uploadError) {
-                btn.innerText = "Publicar";
-                return alert("Error al subir");
-            }
-
+            await _supabase.storage.from('fotos').upload(n, f);
             const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
             const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
-            
-            await _supabase.from('publicaciones').insert([{ 
-                'URL de la imagen': uD.publicUrl, 
-                'descripción': document.getElementById('pie').value, 
-                'nombre_usuario': p ? p.username : 'Usuario', 
-                'email_usuario': user.email 
-            }]);
-            
+            await _supabase.from('publicaciones').insert([{ 'URL de la imagen': uD.publicUrl, 'descripción': document.getElementById('pie').value, 'nombre_usuario': p ? p.username : 'Usuario', 'email_usuario': user.email }]);
             alert("¡Publicado!");
             location.reload();
         }
@@ -317,7 +191,7 @@
         async function agregarPorNombre() {
             const n = document.getElementById('buscar-username').value;
             const { data: perf } = await _supabase.from('perfiles').select('email').eq('username', n).maybeSingle();
-            if(!perf) return alert("No existe ese alias");
+            if(!perf) return alert("No existe");
             const { data: { user } } = await _supabase.auth.getUser();
             await _supabase.from('contactos').insert([{ usuario_id: user.id, contacto_email: perf.email }]);
             alert("Agregado");
