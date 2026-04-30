@@ -8,10 +8,8 @@
     <!-- FUENTE CURSIVA ELEGANTE -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
-    <!-- 1. PARA ANDROID -->
+    <!-- CONFIGURACIÓN DEL LOGO (IPHONE Y ANDROID) -->
     <link rel="manifest" href="/manifest.json">
-    
-    <!-- 2. PARA IPHONE -->
     <link rel="apple-touch-icon" href="https://i.pinimg.com/736x/18/9f/75/189f7556dcb1da733939f8b668bdde68.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -64,9 +62,7 @@
             border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: background 0.3s;
         }
-        button:active { background: #1b3a1a; }
         
         .profile-header { display: flex; align-items: center; padding: 20px 0; }
         .profile-pic { 
@@ -75,14 +71,8 @@
             border-radius: 50%; 
             border: 2px solid #2d5a27; 
             object-fit: cover; 
-            background: #eee;
         }
         
-        .profile-stats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
-        .stat-num { font-weight: bold; display: block; font-size: 17px; color: #1b3a1a; }
-        .profile-name-bar { font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #1b3a1a; }
-        .profile-bio { font-size: 14px; margin: 0; color: #4a5d4a; }
-
         .navbar { 
             position: fixed; 
             bottom: 0; 
@@ -126,7 +116,6 @@
         <header><div class="titulo-cursivo" style="font-size: 24px; margin: 0;">By His Side</div></header>
         <div class="container">
             <div id="view-home"><div id="feed-general"></div></div>
-            
             <div id="view-search" class="hidden">
                 <div class="card">
                     <h3>🔍 Buscar Amigos</h3>
@@ -134,7 +123,6 @@
                     <button onclick="agregarPorNombre()">Agregar</button>
                 </div>
             </div>
-
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3>➕ Nuevo Recuerdo</h3>
@@ -143,32 +131,20 @@
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
-
             <div id="view-profile" class="hidden">
                 <div class="profile-header">
                     <img id="my-profile-pic" class="profile-pic" src="">
-                    <div class="profile-stats">
-                        <div><span class="stat-num" id="num-posts">0</span><span>recuerdos</span></div>
-                        <div><span class="stat-num" id="num-amigos">0</span><span>amigos</span></div>
+                    <div style="flex:1; display:flex; justify-content:space-around; text-align:center;">
+                        <div><span style="font-weight:bold; display:block;" id="num-posts">0</span><span>recuerdos</span></div>
+                        <div><span style="font-weight:bold; display:block;" id="num-amigos">0</span><span>amigos</span></div>
                     </div>
                 </div>
-                <div id="profile-alias" class="profile-name-bar">Usuario</div>
-                <p id="profile-descripcion" class="profile-bio">Welcome to By His Side ✨</p>
-                
-                <div style="display:flex; gap:8px; margin: 15px 0;">
-                    <button onclick="toggleEdit()" style="background: #e8eee8; color: #2d5a27; flex: 1;">Editar perfil</button>
-                    <button onclick="salir()" style="background: #ffebeb; color: #ed4956; width: auto; padding: 0 10px;">Salir</button>
-                </div>
-
-                <div id="edit-form" class="card hidden">
-                    <input type="file" id="edit-archivo-foto" accept="image/*">
-                    <textarea id="edit-bio" rows="3" placeholder="Tu biografía..."></textarea>
-                    <button id="btn-save" onclick="guardarTodo()">Guardar Cambios</button>
-                </div>
+                <div id="profile-alias" style="font-weight:bold; font-size:18px;">Usuario</div>
+                <p id="profile-descripcion">Welcome to By His Side ✨</p>
+                <button onclick="salir()" style="background: #ffebeb; color: #ed4956; margin-top:10px;">Cerrar Sesión</button>
                 <div id="feed-personal" style="display: flex; flex-wrap: wrap; gap: 4px; padding-top: 20px;"></div>
             </div>
         </div>
-
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
             <button class="nav-item" onclick="showView('search')">🔍</button>
@@ -193,8 +169,8 @@
             const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
             const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
             if (error) return alert(error.message);
-            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e, descripcion: "Welcome to By His Side ✨" }]);
-            alert("¡Registrado! Revisa tu correo o entra directamente.");
+            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e }]);
+            alert("¡Registrado!");
         }
 
         async function login() {
@@ -216,18 +192,12 @@
 
         async function cargarFotos() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data: amigos } = await _supabase.from('contactos').select('contacto_email').eq('usuario_id', user.id);
-            const lista = [user.email];
-            if (amigos) amigos.forEach(a => lista.push(a.contacto_email));
-
-            const { data: pubs } = await _supabase.from('publicaciones')
-                .select('*').in('email_usuario', lista).order('creado_en', { ascending: false });
-
+            const { data: pubs } = await _supabase.from('publicaciones').select('*').order('creado_en', { ascending: false });
             const feed = document.getElementById('feed-general');
-            feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#888; margin-top:50px;'>No hay recuerdos aún.</p>";
+            feed.innerHTML = "";
             pubs?.forEach(p => {
                 feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;">
-                    <div style="padding:10px; font-weight:bold; color: #2d5a27;">@${p.nombre_usuario}</div>
+                    <div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div>
                     <img src="${p['URL de la imagen']}" style="width:100%;">
                     <div style="padding:10px;">${p['descripción'] || ''}</div>
                 </div>`;
@@ -236,46 +206,11 @@
 
         async function cargarDatosPerfil() {
             const { data: { user } } = await _supabase.auth.getUser();
-            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).maybeSingle();
+            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
             if(p) {
                 document.getElementById('profile-alias').innerText = p.username;
-                document.getElementById('profile-descripcion').innerText = p.descripcion || "Welcome to By His Side ✨";
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${user.id}`;
             }
-            
-            const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email);
-            const feedP = document.getElementById('feed-personal');
-            feedP.innerHTML = misPubs?.length ? "" : "<p style='width:100%; text-align:center; color:#888;'>Sin fotos.</p>";
-            misPubs?.forEach(foto => {
-                feedP.innerHTML += `<img src="${foto['URL de la imagen']}" style="width:32.3%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;">`;
-            });
-
-            const { count: nP } = await _supabase.from('publicaciones').select('*', { count: 'exact', head: true }).eq('email_usuario', user.email);
-            const { count: nA } = await _supabase.from('contactos').select('*', { count: 'exact', head: true }).eq('usuario_id', user.id);
-            document.getElementById('num-posts').innerText = nP || 0;
-            document.getElementById('num-amigos').innerText = nA || 0;
-        }
-
-        function toggleEdit() { document.getElementById('edit-form').classList.toggle('hidden'); }
-
-        async function guardarTodo() {
-            const btn = document.getElementById('btn-save'); btn.innerText = "Guardando...";
-            const { data: { user } } = await _supabase.auth.getUser();
-            const bio = document.getElementById('edit-bio').value;
-            const inputFoto = document.getElementById('edit-archivo-foto');
-            let url = document.getElementById('my-profile-pic').src;
-
-            if (inputFoto.files[0]) {
-                const n = `av_${user.id}_${Date.now()}`;
-                await _supabase.storage.from('fotos').upload(n, inputFoto.files[0], { upsert: true });
-                const { data } = _supabase.storage.from('fotos').getPublicUrl(n);
-                url = data.publicUrl;
-            }
-
-            await _supabase.from('perfiles').upsert({ id: user.id, descripcion: bio, foto_perfil: url, email: user.email });
-            alert("¡Perfil actualizado!");
-            btn.innerText = "Guardar Cambios";
-            cargarDatosPerfil(); toggleEdit();
         }
 
         async function subirFoto() {
@@ -286,28 +221,19 @@
             
             btn.innerText = "Subiendo...";
             const n = `${Date.now()}_img`;
-            const { error: storageErr } = await _supabase.storage.from('fotos').upload(n, f);
-            if(storageErr) return alert("Error storage: " + storageErr.message);
-
+            await _supabase.storage.from('fotos').upload(n, f);
             const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
             const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
             
-            const { error: dbErr } = await _supabase.from('publicaciones').insert([{ 
+            await _supabase.from('publicaciones').insert([{ 
                 'URL de la imagen': uD.publicUrl, 
                 'descripción': document.getElementById('pie').value, 
                 'nombre_usuario': p.username, 
                 'email_usuario': user.email 
             }]);
             
-            if(dbErr) {
-                alert("Error base de datos: " + dbErr.message);
-            } else {
-                alert("¡Recuerdo publicado!");
-                document.getElementById('archivo').value = "";
-                document.getElementById('pie').value = "";
-                showView('home');
-            }
-            btn.innerText = "Publicar";
+            alert("¡Publicado!");
+            location.reload();
         }
 
         async function agregarPorNombre() {
@@ -316,8 +242,7 @@
             if(!perf) return alert("No existe ese alias");
             const { data: { user } } = await _supabase.auth.getUser();
             await _supabase.from('contactos').insert([{ usuario_id: user.id, contacto_email: perf.email }]);
-            alert("Amigo agregado");
-            showView('home');
+            alert("Agregado");
         }
 
         checarSesion();
