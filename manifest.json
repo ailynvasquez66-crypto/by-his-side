@@ -5,9 +5,10 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "https://i.ibb.co/3Wk433C/logo-cuadrado.jpg",
+      "src": "https://i.pinimg.com/736x/18/9f/75/189f7556dcb1da733939f8b668bdde68.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
