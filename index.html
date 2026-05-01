@@ -10,8 +10,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="By His Side">
     
-    <!-- REEMPLAZA ESTE LINK CON LA URL PÚBLICA DE TU LOGO EN SUPABASE -->
-    <link rel="apple-touch-icon" href="TU_URL_DE_LOGO_AQUI">
+    <!-- <--- PEGA TU URL AQUÍ ABAJO ENTRE LAS COMILLAS ---> -->
+    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png">
+    <link rel="icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -54,9 +55,7 @@
         <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
             <div id="view-home"><div id="feed-general"></div></div>
-            <div id="view-search" class="hidden">
-                <div class="card"><h3>Buscar Amigos</h3><input type="text" placeholder="Alias"><button>Agregar</button></div>
-            </div>
+            <div id="view-search" class="hidden"><div class="card"><h3>Buscar Amigos</h3><input type="text" placeholder="Alias"><button>Agregar</button></div></div>
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
@@ -85,13 +84,11 @@
         </nav>
     </div>
 
-    <!-- MODAL DE EDICIÓN CON SEGURO -->
+    <!-- MODAL DE EDICIÓN -->
     <div id="modal-editar" class="hidden">
         <div class="card" style="width: 90%; max-width: 350px;">
             <h3 class="titulo-cursivo" style="text-align: center;">Editar Perfil</h3>
-            <label style="font-size: 12px; color: #666;">Cambiar foto:</label>
             <input type="file" id="edit-foto" accept="image/*">
-            <label style="font-size: 12px; color: #666;">Cambiar alias:</label>
             <input type="text" id="edit-alias" placeholder="Nuevo alias">
             <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar Cambios</button>
             <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 10px;">Cancelar</button>
@@ -121,7 +118,7 @@
             const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
             if (error) return alert(error.message);
             await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e }]);
-            alert("¡Cuenta creada! Revisa tu correo o entra.");
+            alert("¡Cuenta creada!");
         }
 
         async function checarSesion() {
@@ -155,9 +152,8 @@
             const { data: pubs } = await _supabase.from('publicaciones').select('*').neq('email_usuario', user.email).order('creado_en', { ascending: false });
             const feed = document.getElementById('feed-general');
             feed.innerHTML = "";
-            if(!pubs || pubs.length === 0) feed.innerHTML = "<p style='text-align:center; padding:20px; color:#666;'>No hay fotos de tus amigos aún.</p>";
             pubs?.forEach(p => {
-                feed.innerHTML += `<div class="card"><div style="font-weight:bold; color:#2d5a27; margin-bottom:5px;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" class="post-img"><div>${p['descripción'] || ''}</div></div>`;
+                feed.innerHTML += `<div class="card"><div style="font-weight:bold; color:#2d5a27;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" class="post-img"><div>${p['descripción'] || ''}</div></div>`;
             });
         }
 
@@ -183,17 +179,10 @@
         async function guardarPerfil() {
             const btn = document.getElementById('btn-guardar-p');
             const { data: { user }, error: authErr } = await _supabase.auth.getUser();
-            
-            if(!user || authErr) {
-                alert("Debes iniciar sesión de nuevo.");
-                return location.reload();
-            }
+            if(!user || authErr) return location.reload();
 
             const nuevoAlias = document.getElementById('edit-alias').value;
             const f = document.getElementById('edit-foto').files[0];
-            
-            if(!nuevoAlias && !f) return cerrarModalEdicion();
-
             btn.innerText = "Guardando...";
             btn.disabled = true;
 
@@ -202,18 +191,12 @@
                 if(nuevoAlias) updateData.username = nuevoAlias;
                 if(f) {
                     const n = `avatar_${user.id}_${Date.now()}`;
-                    const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
-                    if(upErr) throw upErr;
+                    await _supabase.storage.from('fotos').upload(n, f);
                     const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
                     updateData.foto_perfil = uD.publicUrl;
                 }
-                
-                const { error: dbErr } = await _supabase.from('perfiles').update(updateData).eq('id', user.id);
-                if(dbErr) throw dbErr;
-
-                if(nuevoAlias) {
-                    await _supabase.from('publicaciones').update({nombre_usuario: nuevoAlias}).eq('email_usuario', user.email);
-                }
+                await _supabase.from('perfiles').update(updateData).eq('id', user.id);
+                if(nuevoAlias) await _supabase.from('publicaciones').update({nombre_usuario: nuevoAlias}).eq('email_usuario', user.email);
                 location.reload();
             } catch (e) {
                 alert("Error: " + e.message);
