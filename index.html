@@ -2,16 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>By His Side 📸</title>
 
-    <!-- 1. ESTO QUITA LA BARRA DE SAFARI -->
+    <!-- CONFIGURACIÓN PWA (Quita barras de Safari) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="By His Side">
-
-    <!-- 2. ESTO PONE EL LOGO EN EL INICIO (Usa tu link de Supabase) -->
-    <link rel="apple-touch-icon" href="PEGA_AQUI_TU_LINK">
+    
+    <!-- ICONO DE INICIO (Pega aquí el link de la "b" verde de tu Supabase) -->
+    <link rel="apple-touch-icon" href="TU_LINK_DE_SUPABASE_AQUI">
 
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,53 +19,89 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
         
-        /* HEADER ARREGLADO */
-        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; }
-        .logo-img { height: 45px; width: auto; object-fit: contain; }
+        /* TEXTO CURSIVO REGRESADO */
+        .titulo-cursivo { 
+            font-family: 'Dancing Script', cursive; 
+            color: #2d5a27; 
+            margin: 0;
+        }
+        
+        header { 
+            background: white; 
+            border-bottom: 1px solid #c2d6c2; 
+            padding: 10px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            min-height: 65px; 
+        }
 
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
         .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* FOTOS DEL FEED */
-        .post-img { width: 100%; border-radius: 8px; display: block; }
-        .post-user { font-weight: bold; margin-bottom: 8px; color: #2d5a27; }
-
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; }
-        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 5px; }
+        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
-        .nav-item { font-size: 24px; background: none; border: none; cursor: pointer; }
+        .nav-item { font-size: 24px; background: none; border: none; }
         .hidden { display: none; }
-        
+
+        .post-img { width: 100%; border-radius: 8px; margin: 10px 0; }
         .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
-        .grid-item { aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; background: #ddd; }
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+        .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; }
     </style>
 </head>
 <body>
 
+    <!-- LOGIN -->
     <div id="auth-screen" class="container">
         <div class="card" style="text-align: center;">
-            <h2 style="font-family: 'Dancing Script'; color: #2d5a27; font-size: 40px; margin: 10px 0;">By His Side</h2>
+            <h1 class="titulo-cursivo" style="font-size: 45px;">By His Side</h1>
+            <input type="text" id="username" placeholder="Tu alias">
             <input type="text" id="email" placeholder="Correo">
             <input type="password" id="password" placeholder="Contraseña">
             <button onclick="login()">Entrar</button>
+            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
         </div>
     </div>
 
+    <!-- APP PRINCIPAL -->
     <div id="main-app" class="hidden">
         <header>
-            <img src="PEGA_AQUI_TU_LINK" class="logo-img">
+            <!-- REGRESAMOS AL TEXTO CURSIVO -->
+            <h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2>
         </header>
         
         <div class="container">
-            <div id="view-home">
-                <div id="feed-general"></div>
+            <!-- VISTA HOME -->
+            <div id="view-home"><div id="feed-general"></div></div>
+
+            <!-- VISTA BUSCADOR (RECUPERADA) -->
+            <div id="view-search" class="hidden">
+                <div class="card">
+                    <h3 class="titulo-cursivo" style="font-size: 24px;">Buscar Amigos</h3>
+                    <input type="text" id="buscar-username" placeholder="Alias exacto">
+                    <button onclick="agregarPorNombre()">Agregar Amigo</button>
+                </div>
             </div>
 
+            <!-- VISTA SUBIR (RECUPERADA) -->
+            <div id="view-upload" class="hidden">
+                <div class="card">
+                    <h3 class="titulo-cursivo" style="font-size: 24px;">Nuevo Recuerdo</h3>
+                    <input type="file" id="archivo" accept="image/*">
+                    <input type="text" id="pie" placeholder="Escribe algo...">
+                    <button id="btn-subir" onclick="subirFoto()">Publicar</button>
+                </div>
+            </div>
+
+            <!-- VISTA PERFIL -->
             <div id="view-profile" class="hidden">
                 <div class="card" style="text-align: center;">
-                    <img id="my-profile-pic" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #2d5a27;">
+                    <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #2d5a27;">
                     <h3 id="profile-alias">@usuario</h3>
                     <button onclick="salir()" style="background: #ed4956;">Cerrar Sesión</button>
                 </div>
@@ -76,6 +111,8 @@
 
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
+            <button class="nav-item" onclick="showView('search')">🔍</button>
+            <button class="nav-item" onclick="showView('upload')">➕</button>
             <button class="nav-item" onclick="showView('profile')">👤</button>
         </nav>
     </div>
@@ -86,21 +123,28 @@
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
 
         function showView(v) {
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-profile').classList.add('hidden');
+            ['home', 'search', 'upload', 'profile'].forEach(x => {
+                const el = document.getElementById('view-'+x);
+                if(el) el.classList.add('hidden');
+            });
             document.getElementById('view-'+v).classList.remove('hidden');
             if(v==='home') cargarFotos();
             if(v==='profile') cargarDatosPerfil();
         }
 
         async function login() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value;
             const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
             if (error) alert("Error: " + error.message); else location.reload();
         }
 
-        async function salir() { await _supabase.auth.signOut(); location.reload(); }
+        async function registro() {
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
+            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
+            if (error) return alert(error.message);
+            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e }]);
+            alert("¡Cuenta creada!");
+        }
 
         async function checarSesion() {
             const { data: { user } } = await _supabase.auth.getUser();
@@ -111,17 +155,26 @@
             }
         }
 
+        async function subirFoto() {
+            const btn = document.getElementById('btn-subir');
+            const { data: { user } } = await _supabase.auth.getUser();
+            const f = document.getElementById('archivo').files[0];
+            if(!f) return alert("Selecciona una foto");
+            btn.innerText = "Subiendo...";
+            const n = `post_${Date.now()}`;
+            await _supabase.storage.from('fotos').upload(n, f);
+            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
+            await _supabase.from('publicaciones').insert([{ 'URL de la imagen': uD.publicUrl, 'descripción': document.getElementById('pie').value, 'nombre_usuario': p.username, 'email_usuario': user.email }]);
+            location.reload();
+        }
+
         async function cargarFotos() {
             const { data: pubs } = await _supabase.from('publicaciones').select('*').order('creado_en', { ascending: false });
             const feed = document.getElementById('feed-general');
             feed.innerHTML = "";
             pubs?.forEach(p => {
-                feed.innerHTML += `
-                    <div class="card">
-                        <div class="post-user">@${p.nombre_usuario}</div>
-                        <img src="${p['URL de la imagen']}" class="post-img">
-                        <div style="margin-top:10px;">${p['descripción'] || ''}</div>
-                    </div>`;
+                feed.innerHTML += `<div class="card"><div style="font-weight:bold; color:#2d5a27;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" class="post-img"><div>${p['descripción'] || ''}</div></div>`;
             });
         }
 
@@ -139,6 +192,8 @@
                 feedP.innerHTML += `<div class="grid-item"><img src="${pub['URL de la imagen']}"></div>`;
             });
         }
+
+        async function salir() { await _supabase.auth.signOut(); location.reload(); }
 
         checarSesion();
     </script>
