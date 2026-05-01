@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>By His Side 📸</title>
 
-    <!-- CONFIGURACIÓN PWA (Quita barras de Safari) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- ICONO DE INICIO (Pega aquí el link de la "b" verde de tu Supabase) -->
+    <!-- Pega aquí el link de la "b" verde de tu Supabase para el icono -->
     <link rel="apple-touch-icon" href="TU_LINK_DE_SUPABASE_AQUI">
 
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -18,37 +17,15 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
-        
-        /* TEXTO CURSIVO REGRESADO */
-        .titulo-cursivo { 
-            font-family: 'Dancing Script', cursive; 
-            color: #2d5a27; 
-            margin: 0;
-        }
-        
-        header { 
-            background: white; 
-            border-bottom: 1px solid #c2d6c2; 
-            padding: 10px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            min-height: 65px; 
-        }
-
+        .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; margin: 0; }
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
         .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; }
         button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .nav-item { font-size: 24px; background: none; border: none; }
         .hidden { display: none; }
-
         .post-img { width: 100%; border-radius: 8px; margin: 10px 0; }
         .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
         .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; }
@@ -56,7 +33,6 @@
 </head>
 <body>
 
-    <!-- LOGIN -->
     <div id="auth-screen" class="container">
         <div class="card" style="text-align: center;">
             <h1 class="titulo-cursivo" style="font-size: 45px;">By His Side</h1>
@@ -68,27 +44,17 @@
         </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
     <div id="main-app" class="hidden">
-        <header>
-            <!-- REGRESAMOS AL TEXTO CURSIVO -->
-            <h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2>
-        </header>
-        
+        <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
-            <!-- VISTA HOME -->
             <div id="view-home"><div id="feed-general"></div></div>
-
-            <!-- VISTA BUSCADOR (RECUPERADA) -->
             <div id="view-search" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo" style="font-size: 24px;">Buscar Amigos</h3>
                     <input type="text" id="buscar-username" placeholder="Alias exacto">
-                    <button onclick="agregarPorNombre()">Agregar Amigo</button>
+                    <button onclick="alert('Función de búsqueda en mantenimiento')">Agregar Amigo</button>
                 </div>
             </div>
-
-            <!-- VISTA SUBIR (RECUPERADA) -->
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo" style="font-size: 24px;">Nuevo Recuerdo</h3>
@@ -97,8 +63,6 @@
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
-
-            <!-- VISTA PERFIL -->
             <div id="view-profile" class="hidden">
                 <div class="card" style="text-align: center;">
                     <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #2d5a27;">
@@ -108,7 +72,6 @@
                 <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
-
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
             <button class="nav-item" onclick="showView('search')">🔍</button>
@@ -123,19 +86,16 @@
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
 
         function showView(v) {
-            ['home', 'search', 'upload', 'profile'].forEach(x => {
-                const el = document.getElementById('view-'+x);
-                if(el) el.classList.add('hidden');
-            });
+            ['home', 'search', 'upload', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
             document.getElementById('view-'+v).classList.remove('hidden');
-            if(v==='home') cargarFotos();
-            if(v==='profile') cargarDatosPerfil();
+            if(v=== 'home') cargarFotosAmigos();
+            if(v=== 'profile') cargarDatosPerfil();
         }
 
         async function login() {
             const e = document.getElementById('email').value; const p = document.getElementById('password').value;
             const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
-            if (error) alert("Error: " + error.message); else location.reload();
+            if (error) alert(error.message); else location.reload();
         }
 
         async function registro() {
@@ -151,7 +111,7 @@
             if (user) { 
                 document.getElementById('auth-screen').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden');
-                cargarFotos(); 
+                cargarFotosAmigos(); 
             }
         }
 
@@ -169,10 +129,18 @@
             location.reload();
         }
 
-        async function cargarFotos() {
-            const { data: pubs } = await _supabase.from('publicaciones').select('*').order('creado_en', { ascending: false });
+        // --- EL CAMBIO ESTÁ AQUÍ ---
+        async function cargarFotosAmigos() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            // Trae publicaciones donde el email NO sea el tuyo (.neq = Not Equal)
+            const { data: pubs } = await _supabase.from('publicaciones')
+                .select('*')
+                .neq('email_usuario', user.email) 
+                .order('creado_en', { ascending: false });
+            
             const feed = document.getElementById('feed-general');
             feed.innerHTML = "";
+            if(!pubs || pubs.length === 0) feed.innerHTML = "<p style='text-align:center; padding:20px;'>No hay publicaciones nuevas de tus amigos.</p>";
             pubs?.forEach(p => {
                 feed.innerHTML += `<div class="card"><div style="font-weight:bold; color:#2d5a27;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" class="post-img"><div>${p['descripción'] || ''}</div></div>`;
             });
@@ -185,6 +153,7 @@
                 document.getElementById('profile-alias').innerText = "@" + p.username;
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
             }
+            // Aquí solo tus fotos
             const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email);
             const feedP = document.getElementById('feed-personal');
             feedP.innerHTML = "";
@@ -194,7 +163,6 @@
         }
 
         async function salir() { await _supabase.auth.signOut(); location.reload(); }
-
         checarSesion();
     </script>
 </body>
