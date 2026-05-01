@@ -2,29 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>By His Side 📸</title>
-    
-    <!-- LINK PARA EL ICONO DEL IPHONE (Pega aquí el link de tu imagen de Supabase) -->
-    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_app.png">
-    
+
+    <!-- 1. ESTO QUITA LA BARRA DE SAFARI -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="By His Side">
+
+    <!-- 2. ESTO PONE EL LOGO EN EL INICIO (Usa tu link de Supabase) -->
+    <link rel="apple-touch-icon" href="PEGA_AQUI_TU_LINK">
+
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 80px; }
-        .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; text-align: center; }
-        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; position: sticky; top: 0; z-index: 100; min-height: 60px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
+        
+        /* HEADER ARREGLADO */
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; }
         .logo-img { height: 45px; width: auto; object-fit: contain; }
-        .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; box-sizing: border-box; }
-        .card { background: white; border: 1px solid #c2d6c2; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+
+        .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
+        .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        /* FOTOS DEL FEED */
+        .post-img { width: 100%; border-radius: 8px; display: block; }
+        .post-user { font-weight: bold; margin-bottom: 8px; color: #2d5a27; }
+
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; }
+        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 5px; }
+        
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .nav-item { font-size: 24px; background: none; border: none; cursor: pointer; }
         .hidden { display: none; }
-        .profile-pic { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #2d5a27; object-fit: cover; }
-        .grid-perfil { display: flex; flex-wrap: wrap; gap: 4px; }
-        .grid-item { width: calc(33.33% - 4px); aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; }
+        
+        .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+        .grid-item { aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; background: #ddd; }
         .grid-item img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
@@ -32,28 +47,28 @@
 
     <div id="auth-screen" class="container">
         <div class="card" style="text-align: center;">
-            <h2 class="titulo-cursivo" style="font-size: 42px;">By His Side</h2>
-            <input type="text" id="username" placeholder="Tu alias">
+            <h2 style="font-family: 'Dancing Script'; color: #2d5a27; font-size: 40px; margin: 10px 0;">By His Side</h2>
             <input type="text" id="email" placeholder="Correo">
             <input type="password" id="password" placeholder="Contraseña">
             <button onclick="login()">Entrar</button>
-            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
         <header>
-            <img src="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_app.png" class="logo-img">
+            <img src="PEGA_AQUI_TU_LINK" class="logo-img">
         </header>
         
         <div class="container">
-            <div id="view-home"><div id="feed-general"></div></div>
+            <div id="view-home">
+                <div id="feed-general"></div>
+            </div>
+
             <div id="view-profile" class="hidden">
-                <div style="display:flex; align-items:center; padding-bottom: 20px;">
-                    <img id="my-profile-pic" class="profile-pic" src="">
-                    <div style="margin-left: 20px;">
-                        <span id="profile-alias" style="font-weight:bold; font-size:18px;"></span>
-                    </div>
+                <div class="card" style="text-align: center;">
+                    <img id="my-profile-pic" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #2d5a27;">
+                    <h3 id="profile-alias">@usuario</h3>
+                    <button onclick="salir()" style="background: #ed4956;">Cerrar Sesión</button>
                 </div>
                 <div id="feed-personal" class="grid-perfil"></div>
             </div>
@@ -71,25 +86,21 @@
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
 
         function showView(v) {
-            ['home', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
             document.getElementById('view-'+v).classList.remove('hidden');
             if(v==='home') cargarFotos();
             if(v==='profile') cargarDatosPerfil();
         }
 
         async function login() {
-            const e = document.getElementById('email').value; const p = document.getElementById('password').value;
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
             const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
-            if (error) alert(error.message); else location.reload();
+            if (error) alert("Error: " + error.message); else location.reload();
         }
 
-        async function registro() {
-            const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
-            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
-            if (error) return alert(error.message);
-            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e }]);
-            alert("¡Cuenta creada!");
-        }
+        async function salir() { await _supabase.auth.signOut(); location.reload(); }
 
         async function checarSesion() {
             const { data: { user } } = await _supabase.auth.getUser();
@@ -105,7 +116,12 @@
             const feed = document.getElementById('feed-general');
             feed.innerHTML = "";
             pubs?.forEach(p => {
-                feed.innerHTML += `<div class="card" style="padding:0; overflow:hidden;"><div style="padding:10px; font-weight:bold;">@${p.nombre_usuario}</div><img src="${p['URL de la imagen']}" style="width:100%;"><div style="padding:10px;">${p['descripción'] || ''}</div></div>`;
+                feed.innerHTML += `
+                    <div class="card">
+                        <div class="post-user">@${p.nombre_usuario}</div>
+                        <img src="${p['URL de la imagen']}" class="post-img">
+                        <div style="margin-top:10px;">${p['descripción'] || ''}</div>
+                    </div>`;
             });
         }
 
@@ -117,10 +133,10 @@
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
             }
             const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email);
-            const feedPersonal = document.getElementById('feed-personal');
-            feedPersonal.innerHTML = "";
+            const feedP = document.getElementById('feed-personal');
+            feedP.innerHTML = "";
             misPubs?.forEach(pub => {
-                feedPersonal.innerHTML += `<div class="grid-item"><img src="${pub['URL de la imagen']}"></div>`;
+                feedP.innerHTML += `<div class="grid-item"><img src="${pub['URL de la imagen']}"></div>`;
             });
         }
 
