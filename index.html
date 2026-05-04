@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>By His Side</title>
 
-    <!-- CONFIGURACIÓN PWA PARA IPHONE -->
+    <!-- CONFIGURACIÓN PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="By His Side">
     
-    <!-- <--- PEGA TU URL AQUÍ ABAJO ENTRE LAS COMILLAS ---> -->
+    <!-- ICONO DE LA APP -->
     <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png">
     <link rel="icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png">
 
@@ -26,19 +25,32 @@
         .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; }
         button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #6b8e67; cursor: not-allowed; }
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .nav-item { font-size: 24px; background: none; border: none; }
-        .hidden { display: none; }
+        .hidden { display: none !important; } /* Forzamos que se oculte */
         .post-img { width: 100%; border-radius: 8px; margin: 10px 0; }
         .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
         .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; }
-        #modal-editar { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        
+        /* ESTILO DEL MODAL CORREGIDO */
+        #modal-editar { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 3000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE ACCESO -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="auth-screen" class="container">
         <div class="card" style="text-align: center;">
             <h1 class="titulo-cursivo" style="font-size: 45px;">By His Side</h1>
@@ -50,7 +62,7 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
+    <!-- APP PRINCIPAL -->
     <div id="main-app" class="hidden">
         <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
@@ -84,11 +96,13 @@
         </nav>
     </div>
 
-    <!-- MODAL DE EDICIÓN -->
+    <!-- MODAL DE EDICIÓN (AHORA EMPIEZA OCULTO) -->
     <div id="modal-editar" class="hidden">
         <div class="card" style="width: 90%; max-width: 350px;">
             <h3 class="titulo-cursivo" style="text-align: center;">Editar Perfil</h3>
+            <label style="font-size: 12px; color: #666;">Foto de perfil:</label>
             <input type="file" id="edit-foto" accept="image/*">
+            <label style="font-size: 12px; color: #666;">Nuevo alias:</label>
             <input type="text" id="edit-alias" placeholder="Nuevo alias">
             <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar Cambios</button>
             <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 10px;">Cancelar</button>
@@ -130,20 +144,40 @@
             }
         }
 
-        async function subirFoto() {
-            const btn = document.getElementById('btn-subir');
+        function abrirModalEdicion() { document.getElementById('modal-editar').classList.remove('hidden'); }
+        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
+
+        async function guardarPerfil() {
+            const btn = document.getElementById('btn-guardar-p');
             const { data: { user } } = await _supabase.auth.getUser();
-            if(!user) return alert("Sesión expirada");
-            const f = document.getElementById('archivo').files[0];
-            if(!f) return alert("Selecciona una foto");
-            btn.innerText = "Subiendo...";
+            if(!user) return location.reload();
+
+            const nuevoAlias = document.getElementById('edit-alias').value;
+            const f = document.getElementById('edit-foto').files[0];
+            if(!nuevoAlias && !f) return cerrarModalEdicion();
+
+            btn.innerText = "Guardando...";
             btn.disabled = true;
-            const n = `post_${Date.now()}`;
-            await _supabase.storage.from('fotos').upload(n, f);
-            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
-            await _supabase.from('publicaciones').insert([{ 'URL de la imagen': uD.publicUrl, 'descripción': document.getElementById('pie').value, 'nombre_usuario': p.username, 'email_usuario': user.email }]);
-            location.reload();
+
+            try {
+                let updateData = {};
+                if(nuevoAlias) updateData.username = nuevoAlias;
+                if(f) {
+                    const n = `avatar_${user.id}_${Date.now()}`;
+                    await _supabase.storage.from('fotos').upload(n, f);
+                    const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+                    updateData.foto_perfil = uD.publicUrl;
+                }
+                await _supabase.from('perfiles').update(updateData).eq('id', user.id);
+                if(nuevoAlias) await _supabase.from('publicaciones').update({nombre_usuario: nuevoAlias}).eq('email_usuario', user.email);
+                
+                cerrarModalEdicion();
+                location.reload();
+            } catch (e) {
+                alert("Error: " + e.message);
+                btn.innerText = "Guardar Cambios";
+                btn.disabled = false;
+            }
         }
 
         async function cargarFotosAmigos() {
@@ -173,36 +207,19 @@
             });
         }
 
-        function abrirModalEdicion() { document.getElementById('modal-editar').classList.remove('hidden'); }
-        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
-
-        async function guardarPerfil() {
-            const btn = document.getElementById('btn-guardar-p');
-            const { data: { user }, error: authErr } = await _supabase.auth.getUser();
-            if(!user || authErr) return location.reload();
-
-            const nuevoAlias = document.getElementById('edit-alias').value;
-            const f = document.getElementById('edit-foto').files[0];
-            btn.innerText = "Guardando...";
+        async function subirFoto() {
+            const btn = document.getElementById('btn-subir');
+            const { data: { user } } = await _supabase.auth.getUser();
+            const f = document.getElementById('archivo').files[0];
+            if(!f) return alert("Selecciona una foto");
+            btn.innerText = "Subiendo...";
             btn.disabled = true;
-
-            try {
-                let updateData = {};
-                if(nuevoAlias) updateData.username = nuevoAlias;
-                if(f) {
-                    const n = `avatar_${user.id}_${Date.now()}`;
-                    await _supabase.storage.from('fotos').upload(n, f);
-                    const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-                    updateData.foto_perfil = uD.publicUrl;
-                }
-                await _supabase.from('perfiles').update(updateData).eq('id', user.id);
-                if(nuevoAlias) await _supabase.from('publicaciones').update({nombre_usuario: nuevoAlias}).eq('email_usuario', user.email);
-                location.reload();
-            } catch (e) {
-                alert("Error: " + e.message);
-                btn.innerText = "Guardar Cambios";
-                btn.disabled = false;
-            }
+            const n = `post_${Date.now()}`;
+            await _supabase.storage.from('fotos').upload(n, f);
+            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
+            await _supabase.from('publicaciones').insert([{ 'URL de la imagen': uD.publicUrl, 'descripción': document.getElementById('pie').value, 'nombre_usuario': p.username, 'email_usuario': user.email }]);
+            location.reload();
         }
 
         async function salir() { await _supabase.auth.signOut(); location.reload(); }
