@@ -7,7 +7,9 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png">
+    
+    <!-- Icono con 'v=2' para forzar la actualización en Safari -->
+    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png?v=2">
 
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,9 +31,12 @@
         .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; }
         
         /* MODALES */
-        .modal-full { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 15px; padding: 15px; position: relative; }
-        .btn-cerrar { position: absolute; top: -40px; right: 0; color: white; font-size: 30px; background: none; border: none; width: auto; }
+        .modal-full { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 15px; padding: 0; overflow: hidden; position: relative; }
+        
+        /* BOTONES DEL MODAL FOTO */
+        .header-modal { position: absolute; top: 10px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 15px; z-index: 10; }
+        .btn-modal-icon { background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
         .user-bio { font-size: 14px; color: #555; margin: 10px 0; line-height: 1.4; }
     </style>
 </head>
@@ -53,10 +58,7 @@
     <div id="main-app" class="hidden">
         <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
-            <!-- VISTA INICIO -->
             <div id="view-home"><div id="feed-general"></div></div>
-            
-            <!-- VISTA BUSCAR (RECUPERADA) -->
             <div id="view-search" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Buscar Amigos</h3>
@@ -65,18 +67,14 @@
                 </div>
                 <div id="resultados-busqueda"></div>
             </div>
-
-            <!-- VISTA SUBIR -->
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
                     <input type="file" id="archivo" accept="image/*">
-                    <textarea id="pie" placeholder="Escribe la historia de esta foto..."></textarea>
+                    <textarea id="pie" placeholder="Escribe la historia..."></textarea>
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
-
-            <!-- VISTA PERFIL -->
             <div id="view-profile" class="hidden">
                 <div class="card" style="text-align: center;">
                     <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #2d5a27;">
@@ -90,8 +88,6 @@
                 <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
-
-        <!-- NAVBAR CON BOTÓN DE BUSCAR -->
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
             <button class="nav-item" onclick="showView('search')">🔍</button>
@@ -100,25 +96,13 @@
         </nav>
     </div>
 
-    <!-- MODAL EDITAR PERFIL -->
-    <div id="modal-editar" class="modal-full hidden">
-        <div class="modal-content">
-            <h3 class="titulo-cursivo" style="text-align: center;">Editar Perfil</h3>
-            <label style="font-size: 12px;">Foto:</label>
-            <input type="file" id="edit-foto" accept="image/*">
-            <label style="font-size: 12px;">Alias:</label>
-            <input type="text" id="edit-alias" placeholder="Nuevo alias">
-            <label style="font-size: 12px;">Tu descripción:</label>
-            <textarea id="edit-bio" placeholder="Cuenta algo sobre ti..."></textarea>
-            <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar</button>
-            <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 8px;">Cancelar</button>
-        </div>
-    </div>
-
-    <!-- MODAL VER FOTO GRANDE -->
+    <!-- MODAL FOTO GRANDE -->
     <div id="modal-foto" class="modal-full hidden">
-        <button class="btn-cerrar" onclick="cerrarFoto()">×</button>
-        <div class="modal-content" style="padding: 0; overflow: hidden;">
+        <div class="modal-content">
+            <div class="header-modal">
+                <button class="btn-modal-icon" onclick="cerrarFoto()">←</button>
+                <button class="btn-modal-icon" style="background: rgba(237, 73, 86, 0.8);" onclick="confirmarEliminar()">🗑️</button>
+            </div>
             <img id="img-grande" style="width: 100%; display: block;">
             <div style="padding: 15px;">
                 <p id="texto-grande" style="margin: 0; color: #333;"></p>
@@ -127,16 +111,26 @@
         </div>
     </div>
 
+    <!-- MODAL EDITAR PERFIL -->
+    <div id="modal-editar" class="modal-full hidden">
+        <div class="modal-content" style="padding: 20px;">
+            <h3 class="titulo-cursivo" style="text-align: center;">Editar Perfil</h3>
+            <input type="file" id="edit-foto" accept="image/*">
+            <input type="text" id="edit-alias" placeholder="Nuevo alias">
+            <textarea id="edit-bio" placeholder="Tu descripción..."></textarea>
+            <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar</button>
+            <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 8px;">Cancelar</button>
+        </div>
+    </div>
+
     <script>
         const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
         const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
+        let idFotoActual = null;
 
         function showView(v) {
-            ['home', 'search', 'upload', 'profile'].forEach(x => {
-                const el = document.getElementById('view-'+x);
-                if(el) el.classList.add('hidden');
-            });
+            ['home', 'search', 'upload', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
             document.getElementById('view-'+v).classList.remove('hidden');
             if(v==='home') cargarFotosAmigos();
             if(v==='profile') cargarDatosPerfil();
@@ -174,9 +168,7 @@
             const nAlias = document.getElementById('edit-alias').value;
             const nBio = document.getElementById('edit-bio').value;
             const f = document.getElementById('edit-foto').files[0];
-            
             btn.innerText = "Guardando..."; btn.disabled = true;
-
             let updateData = {};
             if(nAlias) updateData.username = nAlias;
             if(nBio !== null) updateData.bio = nBio;
@@ -208,18 +200,26 @@
                 const imgStr = pub['URL de la imagen'];
                 const descStr = (pub['descripción'] || "Sin descripción").replace(/'/g, "\\'");
                 const fecha = new Date(pub.creado_en).toLocaleDateString();
-                feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}')"><img src="${imgStr}"></div>`;
+                feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', ${pub.id})"><img src="${imgStr}"></div>`;
             });
         }
 
-        function verFoto(url, desc, fecha) {
+        function verFoto(url, desc, fecha, id) {
+            idFotoActual = id;
             document.getElementById('img-grande').src = url;
             document.getElementById('texto-grande').innerText = desc;
             document.getElementById('fecha-grande').innerText = "Publicado el " + fecha;
             document.getElementById('modal-foto').classList.remove('hidden');
         }
 
-        function cerrarFoto() { document.getElementById('modal-foto').classList.add('hidden'); }
+        function cerrarFoto() { document.getElementById('modal-foto').classList.add('hidden'); idFotoActual = null; }
+
+        async function confirmarEliminar() {
+            if(confirm("¿Seguro que quieres borrar este recuerdo?")) {
+                await _supabase.from('publicaciones').delete().eq('id', idFotoActual);
+                location.reload();
+            }
+        }
 
         async function buscarAmigo() {
             const query = document.getElementById('busqueda-usuario').value;
