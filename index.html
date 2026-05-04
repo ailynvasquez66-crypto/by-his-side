@@ -53,7 +53,20 @@
     <div id="main-app" class="hidden">
         <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
+            <!-- VISTA INICIO -->
             <div id="view-home"><div id="feed-general"></div></div>
+            
+            <!-- VISTA BUSCAR (RECUPERADA) -->
+            <div id="view-search" class="hidden">
+                <div class="card">
+                    <h3 class="titulo-cursivo">Buscar Amigos</h3>
+                    <input type="text" id="busqueda-usuario" placeholder="Nombre de usuario...">
+                    <button onclick="buscarAmigo()">Buscar</button>
+                </div>
+                <div id="resultados-busqueda"></div>
+            </div>
+
+            <!-- VISTA SUBIR -->
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
@@ -62,6 +75,8 @@
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
+
+            <!-- VISTA PERFIL -->
             <div id="view-profile" class="hidden">
                 <div class="card" style="text-align: center;">
                     <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #2d5a27;">
@@ -75,8 +90,11 @@
                 <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
+
+        <!-- NAVBAR CON BOTÓN DE BUSCAR -->
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
+            <button class="nav-item" onclick="showView('search')">🔍</button>
             <button class="nav-item" onclick="showView('upload')">➕</button>
             <button class="nav-item" onclick="showView('profile')">👤</button>
         </nav>
@@ -91,7 +109,7 @@
             <label style="font-size: 12px;">Alias:</label>
             <input type="text" id="edit-alias" placeholder="Nuevo alias">
             <label style="font-size: 12px;">Tu descripción:</label>
-            <textarea id="edit-bio" placeholder="Cuenta algo sobre ti o tu relación..."></textarea>
+            <textarea id="edit-bio" placeholder="Cuenta algo sobre ti..."></textarea>
             <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar</button>
             <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 8px;">Cancelar</button>
         </div>
@@ -115,7 +133,10 @@
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
 
         function showView(v) {
-            ['home', 'upload', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
+            ['home', 'search', 'upload', 'profile'].forEach(x => {
+                const el = document.getElementById('view-'+x);
+                if(el) el.classList.add('hidden');
+            });
             document.getElementById('view-'+v).classList.remove('hidden');
             if(v==='home') cargarFotosAmigos();
             if(v==='profile') cargarDatosPerfil();
@@ -154,12 +175,11 @@
             const nBio = document.getElementById('edit-bio').value;
             const f = document.getElementById('edit-foto').files[0];
             
-            btn.innerText = "Guardando...";
-            btn.disabled = true;
+            btn.innerText = "Guardando..."; btn.disabled = true;
 
             let updateData = {};
             if(nAlias) updateData.username = nAlias;
-            if(nBio) updateData.bio = nBio;
+            if(nBio !== null) updateData.bio = nBio;
             if(f) {
                 const n = `avatar_${user.id}_${Date.now()}`;
                 await _supabase.storage.from('fotos').upload(n, f);
@@ -178,7 +198,6 @@
                 document.getElementById('profile-alias').innerText = "@" + p.username;
                 document.getElementById('profile-bio').innerText = p.bio || "Sin descripción aún.";
                 document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
-                // Prellenar campos
                 document.getElementById('edit-alias').value = p.username;
                 document.getElementById('edit-bio').value = p.bio || "";
             }
@@ -202,6 +221,19 @@
 
         function cerrarFoto() { document.getElementById('modal-foto').classList.add('hidden'); }
 
+        async function buscarAmigo() {
+            const query = document.getElementById('busqueda-usuario').value;
+            const { data } = await _supabase.from('perfiles').select('*').ilike('username', `%${query}%`);
+            const res = document.getElementById('resultados-busqueda');
+            res.innerHTML = "";
+            data?.forEach(u => {
+                res.innerHTML += `<div class="card" style="display:flex; align-items:center; gap:10px;">
+                    <img src="${u.foto_perfil || 'https://api.dicebear.com/8.x/initials/svg?seed='+u.username}" style="width:40px; height:40px; border-radius:50%;">
+                    <div style="font-weight:bold;">@${u.username}</div>
+                </div>`;
+            });
+        }
+
         async function cargarFotosAmigos() {
             const { data: { user } } = await _supabase.auth.getUser();
             if(!user) return;
@@ -218,8 +250,7 @@
             const { data: { user } } = await _supabase.auth.getUser();
             const f = document.getElementById('archivo').files[0];
             if(!f) return alert("Selecciona una foto");
-            btn.innerText = "Subiendo...";
-            btn.disabled = true;
+            btn.innerText = "Subiendo..."; btn.disabled = true;
             const n = `post_${Date.now()}`;
             await _supabase.storage.from('fotos').upload(n, f);
             const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
