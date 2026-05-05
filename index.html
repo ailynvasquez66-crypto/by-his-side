@@ -3,184 +3,179 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>By His Side</title>
 
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png?v=4">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { font-family: Arial; background:#f0f4f0; margin:0; }
-.container { max-width:450px; margin:auto; padding:15px; }
-.card { background:white; padding:15px; margin-bottom:10px; border-radius:10px; }
-input, textarea { width:100%; padding:10px; margin:5px 0; }
-button { width:100%; padding:10px; background:#2d5a27; color:white; border:none; }
-.post-img { width:100%; border-radius:10px; margin-top:10px; }
-.grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
+.titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; margin: 0; }
+header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; padding-top: env(safe-area-inset-top); }
+.container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
+.card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
+input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; font-family: inherit; }
+button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; }
+.nav-item { font-size: 24px; background: none; border: none; }
+.hidden { display: none !important; }
+.post-img { width: 100%; border-radius: 8px; margin: 10px 0; object-fit: cover; }
+.grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
 </style>
 </head>
 
 <body>
 
-<div id="auth">
-  <div class="container card">
-    <h2>By His Side</h2>
-    <input id="email" placeholder="Correo">
-    <input id="password" placeholder="Contraseña" type="password">
-    <input id="username" placeholder="Alias (registro)">
-    <button onclick="login()">Entrar</button>
-    <button onclick="registro()">Crear cuenta</button>
-  </div>
+<div id="auth-screen" class="container">
+<div class="card">
+<h1 class="titulo-cursivo">By His Side</h1>
+<input id="reg-username" placeholder="Alias">
+<input id="email" placeholder="Correo">
+<input id="password" type="password" placeholder="Contraseña">
+<button onclick="login()">Entrar</button>
+<button onclick="registro()">Crear cuenta</button>
+</div>
 </div>
 
-<div id="app" style="display:none;">
-  <div class="container">
+<div id="main-app" class="hidden">
+<header><h2 class="titulo-cursivo">By His Side</h2></header>
 
-    <button onclick="vista('home')">🏠</button>
-    <button onclick="vista('upload')">➕</button>
-    <button onclick="vista('profile')">👤</button>
+<div class="container">
 
-    <div id="home"></div>
+<div id="view-home"><div id="feed-general"></div></div>
 
-    <div id="upload" style="display:none;">
-      <input type="file" id="file">
-      <textarea id="desc"></textarea>
-      <button onclick="subirFoto()">Subir</button>
-    </div>
+<div id="view-upload" class="hidden">
+<div class="card">
+<input type="file" id="archivo">
+<textarea id="pie"></textarea>
+<button onclick="subirFoto()" id="btn-subir">Publicar</button>
+</div>
+</div>
 
-    <div id="profile" style="display:none;">
-      <h3 id="alias"></h3>
-      <div id="misFotos" class="grid"></div>
-    </div>
+<div id="view-profile" class="hidden">
+<div class="card">
+<h3 id="profile-alias"></h3>
+<p id="profile-bio"></p>
+</div>
+<div id="feed-personal" class="grid-perfil"></div>
+</div>
 
-  </div>
+</div>
+
+<nav class="navbar">
+<button onclick="showView('home')">🏠</button>
+<button onclick="showView('upload')">➕</button>
+<button onclick="showView('profile')">👤</button>
+</nav>
 </div>
 
 <script>
-const supabase = window.supabase.createClient(
-  "https://ieyquhkoxzvsxlhhdrba.supabase.co",
-  "TU_ANON_KEY_AQUI"
+const _supabase = supabase.createClient(
+'https://ieyquhkoxzvsxlhhdrba.supabase.co',
+'TU_KEY_AQUI'
 );
 
-// SESIÓN
-async function init(){
-  const { data:{user} } = await supabase.auth.getUser();
-  if(user){
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
-    cargarFeed();
-  }
+async function checarSesion(){
+const { data:{user} } = await _supabase.auth.getUser();
+if(user){
+document.getElementById('auth-screen').classList.add('hidden');
+document.getElementById('main-app').classList.remove('hidden');
+showView('home');
 }
-init();
+}
+checarSesion();
 
-// LOGIN
 async function login(){
-  const email = emailInput();
-  const password = passInput();
-  const {error} = await supabase.auth.signInWithPassword({email,password});
-  if(error) alert(error.message);
-  else location.reload();
+const e=email.value;
+const p=password.value;
+const {error}=await _supabase.auth.signInWithPassword({email:e,password:p});
+if(error) alert(error.message); else location.reload();
 }
 
-// REGISTRO
 async function registro(){
-  const email = emailInput();
-  const password = passInput();
-  const username = document.getElementById("username").value;
+const e=email.value;
+const p=password.value;
+const u=document.getElementById('reg-username').value;
 
-  const {data,error} = await supabase.auth.signUp({email,password});
-  if(error) return alert(error.message);
+const {data,error}=await _supabase.auth.signUp({email:e,password:p});
+if(error) return alert(error.message);
 
-  await supabase.from("perfiles").insert([{
-    id:data.user.id,
-    username,
-    bio:""
-  }]);
-
-  alert("Cuenta creada");
+await _supabase.from('perfiles').insert([{id:data.user.id,username:u,bio:""}]);
+alert("Cuenta creada");
 }
 
-// SUBIR FOTO
+function showView(v){
+['home','upload','profile'].forEach(x=>document.getElementById('view-'+x).classList.add('hidden'));
+document.getElementById('view-'+v).classList.remove('hidden');
+if(v==='home') cargarFotosAmigos();
+if(v==='profile') cargarDatosPerfil();
+}
+
+async function cargarDatosPerfil(){
+const { data:{user} } = await _supabase.auth.getUser();
+
+const { data:p } = await _supabase.from('perfiles').select('*').eq('id',user.id).single();
+
+if(p){
+document.getElementById('profile-alias').innerText="@"+p.username;
+document.getElementById('profile-bio').innerText=p.bio||"";
+}
+
+const { data:misPubs } = await _supabase.from('publicaciones')
+.select('*').eq('email_usuario',user.email);
+
+const feed=document.getElementById('feed-personal');
+feed.innerHTML="";
+
+misPubs?.forEach(pub=>{
+feed.innerHTML+=`<div class="grid-item"><img src="${pub.foto_url}"></div>`;
+});
+}
+
 async function subirFoto(){
-  const { data:{user} } = await supabase.auth.getUser();
-  const file = document.getElementById("file").files[0];
-  const desc = document.getElementById("desc").value;
+const { data:{user} } = await _supabase.auth.getUser();
+const f=document.getElementById('archivo').files[0];
+const pie=document.getElementById('pie').value;
 
-  const name = "post_"+Date.now();
+const n=`post_${Date.now()}`;
+await _supabase.storage.from('fotos').upload(n,f);
 
-  await supabase.storage.from("fotos").upload(name,file);
+const { data:urlData }=_supabase.storage.from('fotos').getPublicUrl(n);
 
-  const {data:urlData} = supabase.storage.from("fotos").getPublicUrl(name);
+const { data:p }=await _supabase.from('perfiles').select('username').eq('id',user.id).single();
 
-  const {data:perfil} = await supabase.from("perfiles")
-    .select("username")
-    .eq("id",user.id)
-    .single();
+await _supabase.from('publicaciones').insert([{
+foto_url:urlData.publicUrl,
+descripcion:pie,
+nombre_usuario:p.username,
+email_usuario:user.email
+}]);
 
-  await supabase.from("publicaciones").insert([{
-    foto_url:urlData.publicUrl,
-    descripcion:desc,
-    nombre_usuario:perfil.username,
-    email_usuario:user.email
-  }]);
-
-  cargarFeed();
+showView('profile');
 }
 
-// FEED
-async function cargarFeed(){
-  const {data} = await supabase.from("publicaciones")
-    .select("*")
-    .order("creado_en",{ascending:false});
+async function cargarFotosAmigos(){
+const { data }=await _supabase.from('publicaciones').select('*');
 
-  const cont = document.getElementById("home");
-  cont.innerHTML="";
+const feed=document.getElementById('feed-general');
+feed.innerHTML="";
 
-  data.forEach(p=>{
-    cont.innerHTML += `
-      <div class="card">
-        <b>@${p.nombre_usuario}</b>
-        <img src="${p.foto_url}" class="post-img">
-        <p>${p.descripcion || ""}</p>
-      </div>
-    `;
-  });
+data?.forEach(p=>{
+feed.innerHTML+=`
+<div class="card">
+<b>@${p.nombre_usuario}</b>
+<img src="${p.foto_url}" class="post-img">
+<p>${p.descripcion||""}</p>
+</div>`;
+});
 }
-
-// PERFIL
-async function cargarPerfil(){
-  const { data:{user} } = await supabase.auth.getUser();
-
-  const {data:perfil} = await supabase.from("perfiles")
-    .select("*").eq("id",user.id).single();
-
-  document.getElementById("alias").innerText="@"+perfil.username;
-
-  const {data:fotos} = await supabase.from("publicaciones")
-    .select("*").eq("email_usuario",user.email);
-
-  const grid = document.getElementById("misFotos");
-  grid.innerHTML="";
-
-  fotos.forEach(f=>{
-    grid.innerHTML+=`<img src="${f.foto_url}">`;
-  });
-}
-
-// VISTAS
-function vista(v){
-  ["home","upload","profile"].forEach(x=>{
-    document.getElementById(x).style.display="none";
-  });
-
-  document.getElementById(v).style.display="block";
-
-  if(v==="home") cargarFeed();
-  if(v==="profile") cargarPerfil();
-}
-
-// HELPERS
-function emailInput(){ return document.getElementById("email").value }
-function passInput(){ return document.getElementById("password").value }
 </script>
 
 </body>
