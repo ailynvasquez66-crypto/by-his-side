@@ -1,324 +1,274 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>By His Side</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>By His Side</title>
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Icono de la "b" verde -->
-    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png?v=4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Forzando icono de la "b" verde -->
+    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo.png?v=4">
 
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
-        .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; margin: 0; }
-        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; padding-top: env(safe-area-inset-top); }
-        .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
-        .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; font-family: inherit; }
-        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
-        button:disabled { opacity: 0.5; }
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
-        .nav-item { font-size: 24px; background: none; border: none; padding: 10px; }
-        .hidden { display: none !important; }
-        .post-img { width: 100%; border-radius: 8px; margin: 10px 0; background: #eee; min-height: 200px; object-fit: cover; }
-        .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
-        .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; background: #eee; }
-        
-        /* MODALES */
-        .modal-full { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 15px; padding: 0; overflow: hidden; position: relative; }
-        .header-modal { position: absolute; top: calc(env(safe-area-inset-top) + 15px); left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 3100; }
-        .btn-modal-icon { background: rgba(0,0,0,0.6); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        #img-grande { width: 100%; max-height: 60vh; object-fit: contain; background: #000; display: block; margin-top: 70px; }
-        .user-bio { font-size: 14px; color: #555; margin: 10px 0; line-height: 1.4; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f4f0; margin: 0; padding-bottom: 90px; }
+        .titulo-cursivo { font-family: 'Dancing Script', cursive; color: #2d5a27; margin: 0; }
+        header { background: white; border-bottom: 1px solid #c2d6c2; padding: 10px; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; min-height: 65px; padding-top: env(safe-area-inset-top); }
+        .container { width: 100%; max-width: 450px; margin: auto; padding: 15px; }
+        .card { background: white; border: 1px solid #c2d6c2; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #a3bfa3; border-radius: 8px; font-size: 16px; font-family: inherit; }
+        button { width: 100%; background: #2d5a27; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #c2d6c2; display: flex; justify-content: space-around; padding: 15px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .nav-item { font-size: 24px; background: none; border: none; }
+        .hidden { display: none !important; }
+        .post-img { width: 100%; border-radius: 8px; margin: 10px 0; }
+        .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+        .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; }
+        
+        /* MODALES */
+        .modal-full { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 15px; padding: 0; overflow: hidden; position: relative; }
+        
+        .header-modal { position: absolute; top: calc(env(safe-area-inset-top) + 15px); left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 3100; }
+        .btn-modal-icon { background: rgba(0,0,0,0.6); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        
+        #img-grande { width: 100%; max-height: 65vh; object-fit: contain; background: #000; display: block; margin-top: 80px; }
+        .user-bio { font-size: 14px; color: #555; margin: 10px 0; line-height: 1.4; }
+    </style>
 </head>
 <body>
 
-    <!-- Pantalla de Auth -->
-    <div id="auth-screen" class="container">
-        <div class="card" style="text-align: center;">
-            <h1 class="titulo-cursivo" style="font-size: 45px;">By His Side</h1>
-            <input type="text" id="reg-username" placeholder="Tu alias (solo para registro)">
-            <input type="email" id="email" placeholder="Correo">
-            <input type="password" id="password" placeholder="Contraseña">
-            <button onclick="login()">Entrar</button>
-            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
-        </div>
-    </div>
+    <div id="auth-screen" class="container">
+        <div class="card" style="text-align: center;">
+            <h1 class="titulo-cursivo" style="font-size: 45px;">By His Side</h1>
+            <input type="text" id="username" placeholder="Tu alias">
+            <input type="email" id="email" placeholder="Correo">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button onclick="login()">Entrar</button>
+            <button onclick="registro()" style="background: #6fb98f; margin-top: 10px;">Crear cuenta</button>
+        </div>
+    </div>
 
-    <!-- App Principal -->
-    <div id="main-app" class="hidden">
-        <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
-        <div class="container">
-            
-            <!-- Vista Home: Feed de amigos -->
-            <div id="view-home">
-                <div id="feed-general"></div>
-            </div>
+    <div id="main-app" class="hidden">
+        <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
+        <div class="container">
+            <div id="view-home"><div id="feed-general"></div></div>
+            <div id="view-search" class="hidden">
+                <div class="card">
+                    <h3 class="titulo-cursivo">Buscar Amigos</h3>
+                    <input type="text" id="busqueda-usuario" placeholder="Nombre de usuario...">
+                    <button onclick="buscarAmigo()">Buscar</button>
+                </div>
+                <div id="resultados-busqueda"></div>
+            </div>
+            <div id="view-upload" class="hidden">
+                <div class="card">
+                    <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
+                    <input type="file" id="archivo" accept="image/*">
+                    <textarea id="pie" placeholder="Historia..."></textarea>
+                    <button id="btn-subir" onclick="subirFoto()">Publicar</button>
+                </div>
+            </div>
+            <div id="view-profile" class="hidden">
+                <div class="card" style="text-align: center;">
+                    <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #2d5a27;">
+                    <h3 id="profile-alias" style="margin: 5px 0;">@usuario</h3>
+                    <p id="profile-bio" class="user-bio"></p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="abrirModalEdicion()" style="background: #eef2ee; color: #2d5a27; border: 1px solid #2d5a27;">Editar</button>
+                        <button onclick="salir()" style="background: #ed4956;">Salir</button>
+                    </div>
+                </div>
+                <div id="feed-personal" class="grid-perfil"></div>
+            </div>
+        </div>
+        <nav class="navbar">
+            <button class="nav-item" onclick="showView('home')">🏠</button>
+            <button class="nav-item" onclick="showView('search')">🔍</button>
+            <button class="nav-item" onclick="showView('upload')">➕</button>
+            <button class="nav-item" onclick="showView('profile')">👤</button>
+        </nav>
+    </div>
 
-            <!-- Vista Buscar -->
-            <div id="view-search" class="hidden">
-                <div class="card">
-                    <h3 class="titulo-cursivo">Buscar Amigos</h3>
-                    <input type="text" id="busqueda-usuario" placeholder="Nombre de usuario...">
-                    <button onclick="buscarAmigo()">Buscar</button>
-                </div>
-                <div id="resultados-busqueda"></div>
-            </div>
+    <!-- Modal Foto Grande -->
+    <div id="modal-foto" class="modal-full hidden">
+        <div class="header-modal">
+            <button class="btn-modal-icon" onclick="cerrarFoto()">←</button>
+            <button class="btn-modal-icon" style="background: rgba(237, 73, 86, 0.8);" onclick="confirmarEliminar()">🗑️</button>
+        </div>
+        <div class="modal-content">
+            <img id="img-grande">
+            <div style="padding: 20px;">
+                <p id="texto-grande" style="margin: 0; color: #333;"></p>
+                <small id="fecha-grande" style="color: #999; display: block; margin-top: 10px;"></small>
+            </div>
+        </div>
+    </div>
 
-            <!-- Vista Subir -->
-            <div id="view-upload" class="hidden">
-                <div class="card">
-                    <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
-                    <input type="file" id="archivo" accept="image/*">
-                    <textarea id="pie" placeholder="Escribe la historia de este momento..."></textarea>
-                    <button id="btn-subir" onclick="subirFoto()">Publicar</button>
-                </div>
-            </div>
+    <!-- Modal Editar -->
+    <div id="modal-editar" class="modal-full hidden">
+        <div class="modal-content" style="padding: 20px;">
+            <h3 class="titulo-cursivo">Editar Perfil</h3>
+            <input type="file" id="edit-foto" accept="image/*">
+            <input type="text" id="edit-alias" placeholder="Alias">
+            <textarea id="edit-bio" placeholder="Bio..."></textarea>
+            <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar</button>
+            <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 8px;">Cerrar</button>
+        </div>
+    </div>
 
-            <!-- Vista Perfil: Mis recuerdos -->
-            <div id="view-profile" class="hidden">
-                <div class="card" style="text-align: center;">
-                    <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #2d5a27;">
-                    <h3 id="profile-alias" style="margin: 5px 0;">@usuario</h3>
-                    <p id="profile-bio" class="user-bio"></p>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="abrirModalEdicion()" style="background: #eef2ee; color: #2d5a27; border: 1px solid #2d5a27;">Editar</button>
-                        <button onclick="salir()" style="background: #ed4956;">Salir</button>
-                    </div>
-                </div>
-                <div id="feed-personal" class="grid-perfil"></div>
-            </div>
-        </div>
+    <script>
+        const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
+        const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
+        const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
+        let idFotoActual = null;
 
-        <nav class="navbar">
-            <button class="nav-item" onclick="showView('home')">🏠</button>
-            <button class="nav-item" onclick="showView('search')">🔍</button>
-            <button class="nav-item" onclick="showView('upload')">➕</button>
-            <button class="nav-item" onclick="showView('profile')">👤</button>
-        </nav>
-    </div>
+        function showView(v) {
+            ['home', 'search', 'upload', 'profile'].forEach(x => document.getElementById('view-'+x).classList.add('hidden'));
+            document.getElementById('view-'+v).classList.remove('hidden');
+            if(v==='home') cargarFotosAmigos();
+            if(v==='profile') cargarDatosPerfil();
+        }
 
-    <!-- Modal Foto Expandida -->
-    <div id="modal-foto" class="modal-full hidden">
-        <div class="header-modal">
-            <button class="btn-modal-icon" onclick="cerrarFoto()">←</button>
-            <button id="btn-borrar-pub" class="btn-modal-icon" style="background: rgba(237, 73, 86, 0.8);" onclick="confirmarEliminar()">🗑️</button>
-        </div>
-        <div class="modal-content">
-            <img id="img-grande">
-            <div style="padding: 20px;">
-                <p id="texto-grande" style="margin: 0; color: #333;"></p>
-                <small id="fecha-grande" style="color: #999; display: block; margin-top: 10px;"></small>
-            </div>
-        </div>
-    </div>
+        async function checarSesion() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (user) { 
+                document.getElementById('auth-screen').classList.add('hidden'); 
+                document.getElementById('main-app').classList.remove('hidden');
+                cargarFotosAmigos(); 
+            }
+        }
 
-    <!-- Modal Editar Perfil -->
-    <div id="modal-editar" class="modal-full hidden">
-        <div class="modal-content" style="padding: 20px;">
-            <h3 class="titulo-cursivo">Editar Perfil</h3>
-            <label style="font-size: 12px; color: #666;">Foto de perfil:</label>
-            <input type="file" id="edit-foto" accept="image/*">
-            <input type="text" id="edit-alias" placeholder="Alias">
-            <textarea id="edit-bio" placeholder="Bio..."></textarea>
-            <button onclick="guardarPerfil()" id="btn-guardar-p">Guardar Cambios</button>
-            <button onclick="cerrarModalEdicion()" style="background: #ccc; margin-top: 8px;">Cerrar</button>
-        </div>
-    </div>
+        async function login() {
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value;
+            const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
+            if (error) alert(error.message); else location.reload();
+        }
 
-    <script>
-        const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
-        const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
-        const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
-        let idFotoActual = null;
+        async function registro() {
+            const e = document.getElementById('email').value; const p = document.getElementById('password').value; const u = document.getElementById('username').value;
+            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
+            if (error) return alert(error.message);
+            await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e, bio: "" }]);
+            alert("¡Cuenta creada!");
+        }
 
-        async function checarSesion() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (user) { 
-                document.getElementById('auth-screen').classList.add('hidden'); 
-                document.getElementById('main-app').classList.remove('hidden');
-                showView('home'); 
-            }
-        }
+        function abrirModalEdicion() { document.getElementById('modal-editar').classList.remove('hidden'); }
+        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
 
-        async function login() {
-            const e = document.getElementById('email').value; 
-            const p = document.getElementById('password').value;
-            const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
-            if (error) alert("Error: " + error.message); else location.reload();
-        }
+        async function guardarPerfil() {
+            const btn = document.getElementById('btn-guardar-p');
+            const { data: { user } } = await _supabase.auth.getUser();
+            const nAlias = document.getElementById('edit-alias').value;
+            const nBio = document.getElementById('edit-bio').value;
+            const f = document.getElementById('edit-foto').files[0];
+            btn.innerText = "Guardando..."; btn.disabled = true;
+            let updateData = {};
+            if(nAlias) updateData.username = nAlias;
+            if(nBio !== null) updateData.bio = nBio;
+            if(f) {
+                const n = `avatar_${user.id}_${Date.now()}`;
+                await _supabase.storage.from('fotos').upload(n, f);
+                const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+                updateData.foto_perfil = uD.publicUrl;
+            }
+            await _supabase.from('perfiles').update(updateData).eq('id', user.id);
+            location.reload();
+        }
 
-        async function registro() {
-            const e = document.getElementById('email').value; 
-            const p = document.getElementById('password').value; 
-            const u = document.getElementById('reg-username').value;
-            if(!u) return alert("Escribe un alias para tu perfil");
-            
-            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
-            if (error) return alert(error.message);
-            
-            if(data.user) {
-                await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e, bio: "" }]);
-                alert("¡Cuenta creada! Revisa tu correo o intenta entrar.");
-            }
-        }
+        async function cargarDatosPerfil() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
+            if(p) {
+                document.getElementById('profile-alias').innerText = "@" + p.username;
+                document.getElementById('profile-bio').innerText = p.bio || "Agrega una descripción.";
+                document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
+                document.getElementById('edit-alias').value = p.username;
+                document.getElementById('edit-bio').value = p.bio || "";
+            }
+            const { data: misPubs } = await _supabase.from('publicaciones').select('*').eq('email_usuario', user.email).order('creado_en', { ascending: false });
+            const feedP = document.getElementById('feed-personal');
+            feedP.innerHTML = "";
+            misPubs?.forEach(pub => {
+                const imgStr = pub['URL de la imagen'];
+                const descStr = (pub['descripción'] || "Sin descripción").replace(/'/g, "\\'");
+                const fecha = new Date(pub.creado_en).toLocaleDateString();
+                feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}')"><img src="${imgStr}"></div>`;
+            });
+        }
 
-        function showView(v) {
-            ['home', 'search', 'upload', 'profile'].forEach(x => {
-                document.getElementById('view-'+x).classList.add('hidden');
-            });
-            document.getElementById('view-'+v).classList.remove('hidden');
-            if(v==='home') cargarFotosAmigos();
-            if(v==='profile') cargarDatosPerfil();
-        }
+        function verFoto(url, desc, fecha, id) {
+            idFotoActual = id;
+            document.getElementById('img-grande').src = url;
+            document.getElementById('texto-grande').innerText = desc;
+            document.getElementById('fecha-grande').innerText = "Publicado el " + fecha;
+            document.getElementById('modal-foto').classList.remove('hidden');
+        }
 
-        async function cargarDatosPerfil() {
-          // Busca la línea 143:
-misPubs?.forEach(pub => {
-    const imgStr = pub.foto_url; // CAMBIO AQUÍ
-    const descStr = (pub.descripcion || "Sin descripción").replace(/'/g, "\\'"); // CAMBIO AQUÍ
-    const fecha = new Date(pub.creado_en).toLocaleDateString();
-    feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}', true)"><img src="${imgStr}"></div>`;
-});
-            if(p) {
-                document.getElementById('profile-alias').innerText = "@" + p.username;
-                document.getElementById('profile-bio').innerText = p.bio || "Sin descripción.";
-                document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
-                document.getElementById('edit-alias').value = p.username;
-                document.getElementById('edit-bio').value = p.bio || "";
-            }
+        function cerrarFoto() { document.getElementById('modal-foto').classList.add('hidden'); idFotoActual = null; }
 
-            const { data: misPubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .eq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
+        async function confirmarEliminar() {
+            if(!idFotoActual) return;
+            if(confirm("¿Eliminar este recuerdo?")) {
+                const { error } = await _supabase.from('publicaciones').delete().match({ id: idFotoActual });
+                if(error) {
+                    alert("No se pudo borrar: Revisa que tengas permisos en Supabase.");
+                    console.error(error);
+                } else {
+                    location.reload();
+                }
+            }
+        }
 
-            const feedP = document.getElementById('feed-personal');
-            feedP.innerHTML = "";
-            misPubs?.forEach(pub => {
-                const imgStr = pub['URL de la imagen'];
-                const descStr = (pub['descripción'] || "Sin descripción").replace(/'/g, "\\'");
-                const fecha = new Date(pub.creado_en).toLocaleDateString();
-                feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}', true)"><img src="${imgStr}"></div>`;
-            });
-        }
+        async function buscarAmigo() {
+            const query = document.getElementById('busqueda-usuario').value;
+            const { data } = await _supabase.from('perfiles').select('*').ilike('username', `%${query}%`);
+            const res = document.getElementById('resultados-busqueda');
+            res.innerHTML = "";
+            data?.forEach(u => {
+                res.innerHTML += `<div class="card" style="display:flex; align-items:center; gap:10px;">
+                    <img src="${u.foto_perfil || 'https://api.dicebear.com/8.x/initials/svg?seed='+u.username}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                    <div>@${u.username}</div>
+                </div>`;
+            });
+        }
 
-        async function subirFoto() {
-            const btn = document.getElementById('btn-subir');
-            const { data: { user } } = await _supabase.auth.getUser();
-            const f = document.getElementById('archivo').files[0];
-            const pie = document.getElementById('pie').value;
+        async function cargarFotosAmigos() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if(!user) return;
+            const { data: pubs } = await _supabase.from('publicaciones').select('*').neq('email_usuario', user.email).order('creado_en', { ascending: false });
+            const feed = document.getElementById('feed-general');
+            feed.innerHTML = "";
+            pubs?.forEach(p => {
+                feed.innerHTML += `<div class="card">
+                    <div style="font-weight:bold; color:#2d5a27;">@${p.nombre_usuario}</div>
+                    <img src="${p['URL de la imagen']}" class="post-img">
+                    <div>${p['descripción'] || ''}</div>
+                </div>`;
+            });
+        }
 
-            if(!f) return alert("Selecciona una foto");
-            btn.innerText = "Subiendo..."; btn.disabled = true;
+        async function subirFoto() {
+            const btn = document.getElementById('btn-subir');
+            const { data: { user } } = await _supabase.auth.getUser();
+            const f = document.getElementById('archivo').files[0];
+            if(!f) return alert("Pon una foto");
+            btn.innerText = "Subiendo..."; btn.disabled = true;
+            const n = `post_${Date.now()}`;
+            await _supabase.storage.from('fotos').upload(n, f);
+            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
+            await _supabase.from('publicaciones').insert([{ 'URL de la imagen': uD.publicUrl, 'descripción': document.getElementById('pie').value, 'nombre_usuario': p.username, 'email_usuario': user.email }]);
+            location.reload();
+        }
 
-            const n = `post_${user.id}_${Date.now()}`;
-            const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
-            
-            if(upErr) {
-                alert("Error subiendo: " + upErr.message);
-                btn.innerText = "Publicar"; btn.disabled = false;
-                return;
-            }
-
-            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
-
-            await _supabase.from('publicaciones').insert([{ 
-                'URL de la imagen': uD.publicUrl, 
-                'descripción': pie, 
-                'nombre_usuario': p.username, 
-                'email_usuario': user.email 
-            }]);
-
-            showView('profile');
-            btn.innerText = "Publicar"; btn.disabled = false;
-            document.getElementById('archivo').value = "";
-            document.getElementById('pie').value = "";
-        }
-
-        async function cargarFotosAmigos() {
-           const imgStr = p.foto_url; // CAMBIO AQUÍ
-    const descStr = (p.descripcion || '').replace(/'/g, "\\'"); // CAMBIO AQUÍ
-    
-    feed.innerHTML += `<div class="card">
-        <div style="font-weight:bold; color:#2d5a27; margin-bottom:8px;">@${p.nombre_usuario}</div>
-        <img src="${imgStr}" class="post-img" onclick="verFoto('${imgStr}', '${descStr}', '${new Date(p.creado_en).toLocaleDateString()}', '${p.id}', false)">
-        <div>${p.descripcion || ''}</div> 
-    </div>`;
-            });
-        }
-
-        async function guardarPerfil() {
-            const btn = document.getElementById('btn-guardar-p');
-            const { data: { user } } = await _supabase.auth.getUser();
-            const nAlias = document.getElementById('edit-alias').value;
-            const nBio = document.getElementById('edit-bio').value;
-            const f = document.getElementById('edit-foto').files[0];
-
-            btn.innerText = "Guardando..."; btn.disabled = true;
-            let updateData = { username: nAlias, bio: nBio };
-
-            if(f) {
-                const n = `avatar_${user.id}`;
-                await _supabase.storage.from('fotos').upload(n, f, { upsert: true });
-                const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-                updateData.foto_perfil = uD.publicUrl;
-            }
-
-            const { error } = await _supabase.from('perfiles').update(updateData).eq('id', user.id);
-            if(error) alert("Error al guardar: " + error.message);
-            location.reload();
-        }
-
-        function verFoto(url, desc, fecha, id, esMia) {
-            idFotoActual = id;
-            document.getElementById('img-grande').src = url;
-            document.getElementById('texto-grande').innerText = desc;
-            document.getElementById('fecha-grande').innerText = "Publicado el " + fecha;
-            document.getElementById('modal-foto').classList.remove('hidden');
-            // Solo muestra el basurero si la foto es del usuario
-            document.getElementById('btn-borrar-pub').style.display = esMia ? 'flex' : 'none';
-        }
-
-        function cerrarFoto() { document.getElementById('modal-foto').classList.add('hidden'); }
-        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
-        function abrirModalEdicion() { document.getElementById('modal-editar').classList.remove('hidden'); }
-
-        async function confirmarEliminar() {
-            if(confirm("¿Eliminar este recuerdo?")) {
-                const { error } = await _supabase.from('publicaciones').delete().eq('id', idFotoActual);
-                if(error) alert("No se pudo eliminar."); else location.reload();
-            }
-        }
-
-        async function buscarAmigo() {
-            const query = document.getElementById('busqueda-usuario').value;
-            const { data } = await _supabase.from('perfiles').select('*').ilike('username', `%${query}%`);
-            const res = document.getElementById('resultados-busqueda');
-            res.innerHTML = data?.length ? "" : "<p>No se encontraron usuarios.</p>";
-            data?.forEach(u => {
-                res.innerHTML += `<div class="card" style="display:flex; align-items:center; gap:10px;">
-                    <img src="${u.foto_perfil || 'https://api.dicebear.com/8.x/initials/svg?seed='+u.username}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                    <div>@${u.username}</div>
-                </div>`;
-            });
-        }
-
-        async function salir() { await _supabase.auth.signOut(); location.reload(); }
-        
-        // Iniciar
-        checarSesion();
-    </script>
+        async function salir() { await _supabase.auth.signOut(); location.reload(); }
+        checarSesion();
+    </script>
 </body>
 </html>
-reemplazzalos aca para pegar un codigo nuevo y q ya sirvs
