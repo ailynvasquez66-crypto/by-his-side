@@ -208,40 +208,52 @@
             });
         }
 
-        async function subirFoto() {
-            const btn = document.getElementById('btn-subir');
-            const { data: { user } } = await _supabase.auth.getUser();
-            const f = document.getElementById('archivo').files[0];
-            const pie = document.getElementById('pie').value;
+     async function subirFoto() {
+    const btn = document.getElementById('btn-subir');
+    const { data: { user } } = await _supabase.auth.getUser();
+    const f = document.getElementById('archivo').files[0];
+    const pie = document.getElementById('pie').value;
 
-            if(!f) return alert("Selecciona una foto");
-            btn.innerText = "Subiendo..."; btn.disabled = true;
+    if(!f) return alert("Selecciona una foto");
+    btn.innerText = "Subiendo..."; btn.disabled = true;
 
-            const n = `post_${user.id}_${Date.now()}`;
-            const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
-            
-            if(upErr) {
-                alert("Error subiendo: " + upErr.message);
-                btn.innerText = "Publicar"; btn.disabled = false;
-                return;
-            }
+    try {
+        // 1. Subir a Storage
+        const n = `post_${user.id}_${Date.now()}`;
+        const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
+        
+        if(upErr) throw upErr;
 
-            const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-            const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
-      await _supabase.from('publicaciones').insert([{ 
-                'foto_url': uD.publicUrl, 
-                'descripcion': pie, 
-                'nombre_usuario': p.username, 
-                'email_usuario': user.email 
-            }]);
+        // 2. Obtener la URL y el Perfil
+        const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+        const { data: p, error: pErr } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
+        
+        if(pErr) throw new Error("No encontré tu perfil para publicar.");
 
-       showView('profile'); // Te manda a tu perfil para ver la foto nueva
-            btn.innerText = "Publicar"; 
-            btn.disabled = false;
-            document.getElementById('archivo').value = "";
-            document.getElementById('pie').value = "";
-        }
+        // 3. INSERTAR EN LA TABLA (Usando los nombres de image_bd621b.png)
+        const { error: insErr } = await _supabase.from('publicaciones').insert([{ 
+            'foto_url': uD.publicUrl, 
+            'descripcion': pie, 
+            'nombre_usuario': p.username, 
+            'email_usuario': user.email 
+        }]);
 
+        if(insErr) throw insErr;
+
+        // 4. Éxito
+        alert("¡Foto publicada!");
+        document.getElementById('archivo').value = "";
+        document.getElementById('pie').value = "";
+        btn.innerText = "Publicar"; 
+        btn.disabled = false;
+        showView('profile'); // Para que veas que ya apareció
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        btn.innerText = "Publicar"; 
+        btn.disabled = false;
+    }
+}
 async function cargarFotosAmigos() {
     const { data: { user } } = await _supabase.auth.getUser();
     
