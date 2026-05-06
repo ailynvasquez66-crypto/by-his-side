@@ -181,30 +181,31 @@
             if(v==='profile') cargarDatosPerfil();
         }
 
-        async function cargarDatosPerfil() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
-            
-            if(p) {
-                document.getElementById('profile-alias').innerText = "@" + p.username;
-                document.getElementById('profile-bio').innerText = p.bio || "Sin descripción.";
-                document.getElementById('my-profile-pic').src = p.foto_perfil || `https://api.dicebear.com/8.x/initials/svg?seed=${p.username}`;
-                document.getElementById('edit-alias').value = p.username;
-                document.getElementById('edit-bio').value = p.bio || "";
-            }
-            console.log(user.email);
-const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
+// BUSCA ESTA FUNCIÓN EN TU CÓDIGO Y REEMPLÁZALA POR ESTA:
+async function cargarDatosPerfil(user) {
+    const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
         .select('*')
         .eq('email_usuario', user.email)
         .order('creado_en', { ascending: false });
 
-    // ESTO TE DIRÁ EL ERROR EN EL CELULAR:
- if (errLectura) {
-        alert("Error de Supabase: " + errLectura.message);
+    if (errLectura) {
+        alert("Error: " + errLectura.message);
     } else {
-        alert("Fotos encontradas: " + (misPubs ? misPubs.length : 0));
+        const feedP = document.getElementById('feed-personal');
+        feedP.innerHTML = ""; // Limpiamos el contenedor
+
+        misPubs?.forEach(pub => {
+            const imgStr = pub.foto_url;
+            const descStr = (pub.descripcion || "Sin descripcion").replace(/'/g, "\\'");
+            
+            // ESTA ES LA LÍNEA CLAVE: El <img src="${imgStr}"> es lo que hace que se vea la foto
+            feedP.innerHTML += `
+                <div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}')">
+                    <img src="${imgStr}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px;">
+                </div>`;
+        });
     }
-} 
+}
      async function subirFoto() {
     const btn = document.getElementById('btn-subir');
     const { data: { user } } = await _supabase.auth.getUser();
