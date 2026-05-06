@@ -201,8 +201,8 @@
             const feedP = document.getElementById('feed-personal');
             feedP.innerHTML = "";
             misPubs?.forEach(pub => {
-                const imgStr = pub['foto_url'];
-                const descStr = (pub['descripcion'] || "Sin descripcion").replace(/'/g, "\\'");
+                const imgStr = pub'foto_url';
+                const descStr = (pub'descripcion' || "Sin descripcion").replace(/'/g, "\\'");
                 const fecha = new Date(pub.creado_en).toLocaleDateString();
                 feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}', true)"><img src="${imgStr}"></div>`;
             });
