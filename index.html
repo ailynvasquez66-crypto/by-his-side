@@ -204,19 +204,7 @@ const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones
     } else {
         alert("Fotos encontradas: " + (misPubs ? misPubs.length : 0));
     }
-} // <--- ESTA LLAVE ES LA QUE TE FALTA. Ciérrala aquí.
-
-async function subirFoto() { // Aquí empieza la siguiente función...
-            const feedP = document.getElementById('feed-personal');
-            feedP.innerHTML = "";
-            misPubs?.forEach(pub => {
-                const imgStr = pub'foto_url';
-                const descStr = (pub'descripcion' || "Sin descripcion").replace(/'/g, "\\'");
-                const fecha = new Date(pub.creado_en).toLocaleDateString();
-                feedP.innerHTML += `<div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}', true)"><img src="${imgStr}"></div>`;
-            });
-        }
-
+} 
      async function subirFoto() {
     const btn = document.getElementById('btn-subir');
     const { data: { user } } = await _supabase.auth.getUser();
