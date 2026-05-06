@@ -236,31 +236,38 @@
                 'email_usuario': user.email 
             }]);
 
-            showView('profile');
-            btn.innerText = "Publicar"; btn.disabled = false;
+       showView('profile'); // Te manda a tu perfil para ver la foto nueva
+            btn.innerText = "Publicar"; 
+            btn.disabled = false;
             document.getElementById('archivo').value = "";
             document.getElementById('pie').value = "";
         }
 
-        async function cargarFotosAmigos() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            // Trae publicaciones que NO son del usuario logueado (amigos)
-            const { data: pubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .neq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
+     async function cargarFotosAmigos() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        // Trae publicaciones que NO son del usuario logueado (amigos)
+        const { data: pubs } = await _supabase.from('publicaciones')
+            .select('*')
+            .neq('email_usuario', user.email)
+            .order('creado_en', { ascending: false });
 
-            const feed = document.getElementById('feed-general');
-            feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#666;'>No hay publicaciones nuevas de amigos.</p>";
-            
-            pubs?.forEach(p => {
-                feed.innerHTML += `<div class="card">
+        const feed = document.getElementById('feed-general');
+        feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#666;'>No hay publicaciones nuevas de amigos.</p>";
+        
+        pubs?.forEach(p => {
+            // REEMPLAZO IMPORTANTE: Usamos los nombres exactos de tu tabla
+            const urlImagen = p['URL de la imagen']; 
+            const descripcion = p['descripción'] || '';
+            const idPub = p.identificador; // En tu tabla se llama 'identificador'
+
+            feed.innerHTML += `
+                <div class="card">
                     <div style="font-weight:bold; color:#2d5a27; margin-bottom:8px;">@${p.nombre_usuario}</div>
-                    <img src="${p['URL de la imagen']}" class="post-img" onclick="verFoto('${p['URL de la imagen']}', '${(p['descripción'] || '').replace(/'/g, "\\'")}', '${new Date(p.creado_en).toLocaleDateString()}', '${p.id}', false)">
-                    <div style="font-size:14px;">${p['descripción'] || ''}</div>
+                    <img src="${urlImagen}" class="post-img" onclick="verFoto('${urlImagen}', '${descripcion.replace(/'/g, "\\'")}', '${new Date(p.creado_en).toLocaleDateString()}', '${idPub}', false)">
+                    <div style="font-size:14px; margin-top:8px;">${descripcion}</div>
                 </div>`;
-            });
-        }
+        });
+    }
 
         async function guardarPerfil() {
             const btn = document.getElementById('btn-guardar-p');
