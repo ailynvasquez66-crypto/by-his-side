@@ -238,16 +238,18 @@
             'email_usuario': user.email 
         }]);
 
-        if(insErr) throw insErr;
+   if(insErr) throw insErr;
 
-        // 4. Éxito
+        // --- Pégalo aquí (Línea 242 en adelante) ---
         alert("¡Foto publicada!");
+
         document.getElementById('archivo').value = "";
         document.getElementById('pie').value = "";
         btn.innerText = "Publicar"; 
         btn.disabled = false;
-        showView('profile'); // Para que veas que ya apareció
 
+        await cargarDatosPerfil(); 
+        showView('profile'); 
     } catch (err) {
         alert("Error: " + err.message);
         btn.innerText = "Publicar"; 
