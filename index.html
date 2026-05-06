@@ -199,11 +199,14 @@ const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones
         .order('creado_en', { ascending: false });
 
     // ESTO TE DIRÁ EL ERROR EN EL CELULAR:
-    if (errLectura) {
+ if (errLectura) {
         alert("Error de Supabase: " + errLectura.message);
     } else {
         alert("Fotos encontradas: " + (misPubs ? misPubs.length : 0));
     }
+} // <--- ESTA LLAVE ES LA QUE TE FALTA. Ciérrala aquí.
+
+async function subirFoto() { // Aquí empieza la siguiente función...
             const feedP = document.getElementById('feed-personal');
             feedP.innerHTML = "";
             misPubs?.forEach(pub => {
