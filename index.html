@@ -192,12 +192,18 @@
                 document.getElementById('edit-alias').value = p.username;
                 document.getElementById('edit-bio').value = p.bio || "";
             }
+            console.log(user.email);
+const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
+        .select('*')
+        .eq('email_usuario', user.email)
+        .order('creado_en', { ascending: false });
 
-            const { data: misPubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .eq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
-
+    // ESTO TE DIRÁ EL ERROR EN EL CELULAR:
+    if (errLectura) {
+        alert("Error de Supabase: " + errLectura.message);
+    } else {
+        alert("Fotos encontradas: " + (misPubs ? misPubs.length : 0));
+    }
             const feedP = document.getElementById('feed-personal');
             feedP.innerHTML = "";
             misPubs?.forEach(pub => {
