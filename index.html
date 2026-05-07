@@ -136,7 +136,7 @@
     </div>
 
     <script>
-        const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
+      const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
         const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
         const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
         let idFotoActual = null;
@@ -181,105 +181,107 @@
             if(v==='profile') cargarDatosPerfil();
         }
 
-// BUSCA ESTA FUNCIÓN EN TU CÓDIGO Y REEMPLÁZALA POR ESTA:
-async function cargarDatosPerfil(user) {
-    const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
-        .select('*')
-        .eq('email_usuario', user.email)
-        .order('creado_en', { ascending: false });
+        async function cargarDatosPerfil() {
+            const { data: { user } } = await _supabase.auth.getUser(); // Esto te faltaba
+            if (!user) return;
 
-    if (errLectura) {
-        alert("Error: " + errLectura.message);
-    } else {
-        const feedP = document.getElementById('feed-personal');
-        feedP.innerHTML = ""; // Limpiamos el contenedor
+            // Cargamos datos del perfil (foto, alias, bio)
+            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
+            if (p) {
+                document.getElementById('profile-alias').innerText = "@" + p.username;
+                document.getElementById('profile-bio').innerText = p.bio || "Sin biografía";
+                document.getElementById('my-profile-pic').src = p.foto_perfil || 'https://api.dicebear.com/8.x/initials/svg?seed=' + p.username;
+                
+                // Llenamos el modal de edición también
+                document.getElementById('edit-alias').value = p.username;
+                document.getElementById('edit-bio').value = p.bio || "";
+            }
 
-        misPubs?.forEach(pub => {
-            const imgStr = pub.foto_url;
-            const descStr = (pub.descripcion || "Sin descripcion").replace(/'/g, "\\'");
+            // Cargamos las fotos
+            const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
+                .select('*')
+                .eq('email_usuario', user.email)
+                .order('creado_en', { ascending: false });
+
+            const feedP = document.getElementById('feed-personal');
+            feedP.innerHTML = ""; 
+
+            if (errLectura) {
+                console.error(errLectura);
+            } else {
+                alert("Fotos encontradas: " + (misPubs ? misPubs.length : 0));
+                misPubs?.forEach(pub => {
+                    const imgStr = pub.foto_url;
+                    const descStr = (pub.descripcion || "Sin descripcion").replace(/'/g, "\\'");
+                    const fecha = new Date(pub.creado_en).toLocaleDateString();
+                    
+                    feedP.innerHTML += `
+                        <div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}', '${fecha}', '${pub.id}', true)">
+                            <img src="${imgStr}">
+                        </div>`;
+                });
+            }
+        }
+
+        async function subirFoto() {
+            const btn = document.getElementById('btn-subir');
+            const { data: { user } } = await _supabase.auth.getUser();
+            const f = document.getElementById('archivo').files[0];
+            const pie = document.getElementById('pie').value;
+
+            if(!f) return alert("Selecciona una foto");
+            btn.innerText = "Subiendo..."; btn.disabled = true;
+
+            try {
+                const n = `post_${user.id}_${Date.now()}`;
+                const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
+                if(upErr) throw upErr;
+
+                const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
+                const { data: p } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
+
+                const { error: insErr } = await _supabase.from('publicaciones').insert([{ 
+                    'foto_url': uD.publicUrl, 
+                    'descripcion': pie, 
+                    'nombre_usuario': p.username, 
+                    'email_usuario': user.email 
+                }]);
+
+                if(insErr) throw insErr;
+
+                alert("¡Foto publicada!");
+                document.getElementById('archivo').value = "";
+                document.getElementById('pie').value = "";
+                btn.innerText = "Publicar"; btn.disabled = false;
+                cargarDatosPerfil(); 
+                showView('profile'); 
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.innerText = "Publicar"; btn.disabled = false;
+            }
+        }
+
+        async function cargarFotosAmigos() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            const { data: pubs } = await _supabase.from('publicaciones')
+                .select('*')
+                .neq('email_usuario', user.email)
+                .order('creado_en', { ascending: false });
+
+            const feed = document.getElementById('feed-general');
+            feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#666;'>No hay publicaciones nuevas.</p>";
             
-            // ESTA ES LA LÍNEA CLAVE: El <img src="${imgStr}"> es lo que hace que se vea la foto
-            feedP.innerHTML += `
-                <div class="grid-item" onclick="verFoto('${imgStr}', '${descStr}')">
-                    <img src="${imgStr}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px;">
-                </div>`;
-        });
-    }
-}
-     async function subirFoto() {
-    const btn = document.getElementById('btn-subir');
-    const { data: { user } } = await _supabase.auth.getUser();
-    const f = document.getElementById('archivo').files[0];
-    const pie = document.getElementById('pie').value;
-
-    if(!f) return alert("Selecciona una foto");
-    btn.innerText = "Subiendo..."; btn.disabled = true;
-
-    try {
-        // 1. Subir a Storage
-        const n = `post_${user.id}_${Date.now()}`;
-        const { error: upErr } = await _supabase.storage.from('fotos').upload(n, f);
-        
-        if(upErr) throw upErr;
-
-        // 2. Obtener la URL y el Perfil
-        const { data: uD } = _supabase.storage.from('fotos').getPublicUrl(n);
-        const { data: p, error: pErr } = await _supabase.from('perfiles').select('username').eq('id', user.id).single();
-        
-        if(pErr) throw new Error("No encontré tu perfil para publicar.");
-
-        // 3. INSERTAR EN LA TABLA (Usando los nombres de image_bd621b.png)
-        const { error: insErr } = await _supabase.from('publicaciones').insert([{ 
-            'foto_url': uD.publicUrl, 
-            'descripcion': pie, 
-            'nombre_usuario': p.username, 
-            'email_usuario': user.email 
-        }]);
-
-   if(insErr) throw insErr;
-
-        // --- Pégalo aquí (Línea 242 en adelante) ---
-        alert("¡Foto publicada!");
-
-        document.getElementById('archivo').value = "";
-        document.getElementById('pie').value = "";
-        btn.innerText = "Publicar"; 
-        btn.disabled = false;
-
-        await cargarDatosPerfil(); 
-        showView('profile'); 
-    } catch (err) {
-        alert("Error: " + err.message);
-        btn.innerText = "Publicar"; 
-        btn.disabled = false;
-    }
-}
-async function cargarFotosAmigos() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    
-    // Trae publicaciones de otros usuarios
-    const { data: pubs } = await _supabase.from('publicaciones')
-        .select('*')
-        .neq('email_usuario', user.email)
-        .order('creado_en', { ascending: false });
-
-    const feed = document.getElementById('feed-general');
-    feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#666;'>No hay publicaciones nuevas de amigos.</p>";
-    
-    pubs?.forEach(p => {
-        // Usamos los nombres nuevos que pusiste en Supabase
-        const urlImagen = p.foto_url; 
-        const textoDesc = p.descripcion || '';
-        const idPub = p.id; 
-
-        feed.innerHTML += `
-            <div class="card">
-                <div style="font-weight:bold; color:#2d5a27; margin-bottom:8px;">@${p.nombre_usuario}</div>
-                <img src="${urlImagen}" class="post-img" onclick="verFoto('${urlImagen}', '${textoDesc.replace(/'/g, "\\'")}', '${new Date(p.creado_en).toLocaleDateString()}', '${idPub}', false)">
-                <div style="font-size:14px; margin-top:8px;">${textoDesc}</div>
-            </div>`;
-    });
-}
+            pubs?.forEach(p => {
+                const urlImg = p.foto_url;
+                const desc = (p.descripcion || "").replace(/'/g, "\\'");
+                feed.innerHTML += `
+                    <div class="card">
+                        <div style="font-weight:bold; color:#2d5a27; margin-bottom:8px;">@${p.nombre_usuario}</div>
+                        <img src="${urlImg}" class="post-img" onclick="verFoto('${urlImg}', '${desc}', '${new Date(p.creado_en).toLocaleDateString()}', '${p.id}', false)">
+                        <div style="font-size:14px; margin-top:8px;">${p.descripcion || ""}</div>
+                    </div>`;
+            });
+        }
 
         async function guardarPerfil() {
             const btn = document.getElementById('btn-guardar-p');
@@ -299,7 +301,7 @@ async function cargarFotosAmigos() {
             }
 
             const { error } = await _supabase.from('perfiles').update(updateData).eq('id', user.id);
-            if(error) alert("Error al guardar: " + error.message);
+            if(error) alert("Error: " + error.message);
             location.reload();
         }
 
@@ -309,7 +311,6 @@ async function cargarFotosAmigos() {
             document.getElementById('texto-grande').innerText = desc;
             document.getElementById('fecha-grande').innerText = "Publicado el " + fecha;
             document.getElementById('modal-foto').classList.remove('hidden');
-            // Solo muestra el basurero si la foto es del usuario
             document.getElementById('btn-borrar-pub').style.display = esMia ? 'flex' : 'none';
         }
 
@@ -339,7 +340,6 @@ async function cargarFotosAmigos() {
 
         async function salir() { await _supabase.auth.signOut(); location.reload(); }
         
-        // Iniciar
         checarSesion();
     </script>
 </body>
