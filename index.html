@@ -7,10 +7,10 @@
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/nuevo_logo.png">
-<link rel="icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/nuevo_logo.png" type="image/png">
-
     
+    <link rel="apple-touch-icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_b.png">
+    <link rel="icon" href="https://ieyquhkoxzvsxlhhdrba.supabase.co/storage/v1/object/public/fotos/logo_b.png" type="image/png">
+
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -31,7 +31,6 @@
         .grid-perfil { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
         .grid-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; background: #eee; }
         
-        /* MODALES */
         .modal-full { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 15px; padding: 0; overflow: hidden; position: relative; }
         .header-modal { position: absolute; top: calc(env(safe-area-inset-top) + 15px); left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 3100; }
@@ -56,11 +55,7 @@
     <div id="main-app" class="hidden">
         <header><h2 class="titulo-cursivo" style="font-size: 32px;">By His Side</h2></header>
         <div class="container">
-            
-            <div id="view-home">
-                <div id="feed-general"></div>
-            </div>
-
+            <div id="view-home"><div id="feed-general"></div></div>
             <div id="view-search" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Buscar Amigos</h3>
@@ -69,7 +64,6 @@
                 </div>
                 <div id="resultados-busqueda"></div>
             </div>
-
             <div id="view-upload" class="hidden">
                 <div class="card">
                     <h3 class="titulo-cursivo">Nuevo Recuerdo</h3>
@@ -78,7 +72,6 @@
                     <button id="btn-subir" onclick="subirFoto()">Publicar</button>
                 </div>
             </div>
-
             <div id="view-profile" class="hidden">
                 <div class="card" style="text-align: center;">
                     <img id="my-profile-pic" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #2d5a27;">
@@ -92,7 +85,6 @@
                 <div id="feed-personal" class="grid-perfil"></div>
             </div>
         </div>
-
         <nav class="navbar">
             <button class="nav-item" onclick="showView('home')">🏠</button>
             <button class="nav-item" onclick="showView('search')">🔍</button>
@@ -101,107 +93,18 @@
         </nav>
     </div>
 
-    <script>
-        // ... (Tu código de Supabase y funciones que ya funcionan perfecto)
-        const URL_PROYECTO = 'https://ieyquhkoxzvsxlhhdrba.supabase.co'; 
-        const LLAVE_PROYECTO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlleXF1aGtveHp2c3hsaGhkcmJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTk3MTUsImV4cCI6MjA5Mjk5NTcxNX0.JIQnmMmkEXFU3VWMKUdMTKh-_SJ0ekEvkVOqM6LJpFs'; 
-        const _supabase = supabase.createClient(URL_PROYECTO, LLAVE_PROYECTO);
-        let idFotoActual = null;
+    <div id="modal-foto" class="modal-full hidden">
+        <div class="header-modal">
+            <button class="btn-modal-icon" onclick="cerrarFoto()">←</button>
+            <button id="btn-borrar-pub" class="btn-modal-icon" style="background: rgba(237, 73, 86, 0.8);" onclick="confirmarEliminar()">🗑️</button>
+        </div>
+        <div class="modal-content">
+            <img id="img-grande">
+            <div style="padding: 20px;">
+                <p id="texto-grande" style="margin: 0; color: #333;"></p>
+                <small id="fecha-grande" style="color: #999; display: block; margin-top: 10px;"></small>
+            </div>
+        </div>
+    </div>
 
-        async function checarSesion() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (user) { 
-                document.getElementById('auth-screen').classList.add('hidden'); 
-                document.getElementById('main-app').classList.remove('hidden');
-                showView('home'); 
-            }
-        }
-
-        async function login() {
-            const e = document.getElementById('email').value; 
-            const p = document.getElementById('password').value;
-            const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
-            if (error) alert("Error: " + error.message); else location.reload();
-        }
-
-        async function registro() {
-            const e = document.getElementById('email').value; 
-            const p = document.getElementById('password').value; 
-            const u = document.getElementById('reg-username').value;
-            if(!u) return alert("Escribe un alias para tu perfil");
-            
-            const { data, error } = await _supabase.auth.signUp({ email: e, password: p });
-            if (error) return alert(error.message);
-            
-            if(data.user) {
-                await _supabase.from('perfiles').insert([{ id: data.user.id, username: u, email: e, bio: "" }]);
-                alert("¡Cuenta creada! Revisa tu correo o intenta entrar.");
-            }
-        }
-
-        function showView(v) {
-            ['home', 'search', 'upload', 'profile'].forEach(x => {
-                const el = document.getElementById('view-'+x);
-                if(el) el.classList.add('hidden');
-            });
-            const target = document.getElementById('view-'+v);
-            if(target) target.classList.remove('hidden');
-            
-            if(v==='home') cargarFotosAmigos();
-            if(v==='profile') cargarDatosPerfil();
-        }
-
-        async function cargarDatosPerfil() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) return;
-
-            const { data: p } = await _supabase.from('perfiles').select('*').eq('id', user.id).single();
-            if (p) {
-                document.getElementById('profile-alias').innerText = "@" + p.username;
-                document.getElementById('profile-bio').innerText = p.bio || "Sin biografía";
-                document.getElementById('my-profile-pic').src = p.foto_perfil || 'https://api.dicebear.com/8.x/initials/svg?seed=' + p.username;
-            }
-
-            const { data: misPubs, error: errLectura } = await _supabase.from('publicaciones')
-                .select('*')
-                .eq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
-
-            const feedP = document.getElementById('feed-personal');
-            if(feedP) {
-                feedP.innerHTML = ""; 
-                misPubs?.forEach(pub => {
-                    feedP.innerHTML += `
-                        <div class="grid-item" onclick="verFoto('${pub.foto_url}', '${(pub.descripcion || "").replace(/'/g, "\\'")}', '${new Date(pub.creado_en).toLocaleDateString()}', '${pub.id}', true)">
-                            <img src="${pub.foto_url}">
-                        </div>`;
-                });
-            }
-        }
-
-        async function cargarFotosAmigos() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            const { data: pubs } = await _supabase.from('publicaciones')
-                .select('*')
-                .neq('email_usuario', user.email)
-                .order('creado_en', { ascending: false });
-
-            const feed = document.getElementById('feed-general');
-            if(feed) {
-                feed.innerHTML = pubs?.length ? "" : "<p style='text-align:center; color:#666;'>No hay publicaciones nuevas.</p>";
-                pubs?.forEach(p => {
-                    feed.innerHTML += `
-                        <div class="card">
-                            <div style="font-weight:bold; color:#2d5a27; margin-bottom:8px;">@${p.nombre_usuario}</div>
-                            <img src="${p.foto_url}" class="post-img" onclick="verFoto('${p.foto_url}', '${(p.descripcion || "").replace(/'/g, "\\'")}', '${new Date(p.creado_en).toLocaleDateString()}', '${p.id}', false)">
-                            <div style="font-size:14px; margin-top:8px;">${p.descripcion || ""}</div>
-                        </div>`;
-                });
-            }
-        }
-        
-        // El resto de funciones se mantienen iguales...
-        checarSesion();
-    </script>
-</body>
-</html>
+    <div id
